@@ -1,5 +1,5 @@
 # Code for per2py data analysis
-This repository contains code for processing SCN color-switching Per2iLuc data in a high-throughput manner, with a manuscript under review. This package uses the scientific Python stack to 
+This repository contains code for processing SCN color-switching Per2iLuc data in a high-throughput manner, with a manuscript under review. This package uses the scientific Python stack to identify and process circadian oscillatory data in a reproducible manner.
 
 Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs.
 
@@ -27,6 +27,7 @@ python -m pip install --user numpy scipy matplotlib ipython jupyter pandas spect
 
 ## Without Anaconda
 If not using Anaconda, it is sufficient to ensure that the following packages are installed in a Python 2.7 environment:
+
 | Package | Version | Website |
 |---------|---------|---------------------------|
 |`jupyter`|1.0.0|https://jupyter.org/|
