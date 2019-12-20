@@ -1,12 +1,12 @@
 '''
-Abel&Yongli March 26 2018
-This is the March 26, 2018 version of the data processing for single-cell
-bioluminescence recordings with two channels handled separately. This file is saved as such to checkpoint it.
+File containing functions useful for data analysis.
 '''
 
 
 from __future__ import division
+
 # imports
+import os
 import numpy  as np
 import scipy as sp
 import pandas as pd
@@ -18,24 +18,28 @@ from LocalImports import PlotOptions as plo
 from LocalImports import Bioluminescence as blu
 from LocalImports import DecayingSinusoid as dsin
 
-def generate_filenames_dict(input_folder, data_type,
-                        pull_from_imagej, input_ij_file, input_ij_extension, color):
+def generate_filenames_dict(input_folder, input_file,
+                        pull_from_imagej, input_ij_extension='.csv'):
     """
     Creates dict of input data
     """
     input_dict = {'input_folder':input_folder,
-                  'data_type':data_type,
+                  'data_type':input_file,
                   'pull_from_imagej':pull_from_imagej,
-                  'input_ij_file':input_ij_file,
-                  'input_ij_extension':input_ij_extension,
-                  'color':color}
+                  'input_ij_file':input_file,
+                  'input_ij_extension':input_ij_extension}
 
     #inputs - autoset
-    input_dict['input_data'] = input_folder+input_ij_file+input_ij_extension
+    input_dict['input_data'] = input_folder+input_file+input_ij_extension
+    data_type = input_file
 
     #outputs - general
     output_extension = '.csv'
-    output_folder = input_folder
+    output_folder = input_folder+'analysis_output/'
+    try:
+        os.mkdir(output_folder)
+    except OSError:
+        pass
 
     # outputs - locations of raw data
     input_dict['raw_signal'] = output_folder +data_type+'_signal'+output_extension
@@ -52,7 +56,7 @@ def generate_filenames_dict(input_folder, data_type,
     input_dict['output_zscore'] = output_folder+data_type+'_zscore'+output_extension
     return input_dict
 
-def load_imagej_file(input_data, raw_signal, raw_xy, color, input_ij_extension=None):
+def load_imagej_file(input_data, raw_signal, raw_xy, input_ij_extension=None):
     """
     Function to load imageJ files and save them in raw_signal and raw_xy
     locations. input_ij_extension can be set manually, defaults to last
@@ -69,27 +73,20 @@ def load_imagej_file(input_data, raw_signal, raw_xy, color, input_ij_extension=N
         ij_file = pd.read_excel(input_data, sheet_name=None)
         ij_sheet = ij_file[ij_file.keys()[0]]
 
-    # x and y are self-evident, cell id is the track_id, mean_intensity04
+    # x and y are self-evident, cell id is the track_id, mean_intensityXX
     # is the biolum we want
-
-    # choose the column of signal
-    if color == 'Green':
-        useful_frames = ['TRACK_ID', 'POSITION_X', 'POSITION_Y', 'FRAME',
-                     'MEAN_INTENSITY04']
-    elif color == 'Red':
-        useful_frames = ['TRACK_ID', 'POSITION_X', 'POSITION_Y', 'FRAME',
-                     'MEAN_INTENSITY02']
+    useful_frames = ['TRACK_ID', 'POSITION_X', 'POSITION_Y', 'FRAME']
 
     # delete the rest
     orig_keys = np.copy(ij_sheet.keys())
     for kdx, key in enumerate(orig_keys):
         if key not in useful_frames:
-            del ij_sheet[orig_keys[kdx]]
+            if key[:14]=='MEAN_INTENSITY':
+                ij_sheet.rename(columns={key: 'MEAN_INTENSITY'}, inplace=True)
+            else:
+                del ij_sheet[orig_keys[kdx]]
     #
-    if color == 'Green':
-        ij_sheet.rename(columns={'MEAN_INTENSITY04': 'MEAN_INTENSITY'}, inplace=True)
-    elif color == 'Red':
-        ij_sheet.rename(columns={'MEAN_INTENSITY02': 'MEAN_INTENSITY'}, inplace=True)
+
 
     # collect unique cell ID nos
     cell_ids = ij_sheet.TRACK_ID.unique()
@@ -492,8 +489,7 @@ def sinusoidal_fitting(times, data, rhythmic_or_not, fit_times=None,
 
 def plot_result(cellidx, raw_times, raw_data, trendlines, detrended_times, detrended_data, eigenvalues, final_times, final_data, rhythmic_or_not, pers, pgram_data, sine_times, sine_data, r2s, output_folder, data_type):
     """
-    Really horribly written plotting function. All of this should be re-done
-    with an SCN class, but that will take some refactoring.
+    Plotting utility to plot ALL data at once. A bit of a mess.
     """
     plo.PlotOptions(ticks='in')
     fig = plt.figure(figsize=(4,7))
@@ -555,5 +551,3 @@ def plot_result(cellidx, raw_times, raw_data, trendlines, detrended_times, detre
     plt.savefig(output_folder+data_type+'_cell'+str(cellidx)+'.png', dpi=300)
     plt.close()
     plt.clf()
-
-print "Functions imported from 2018/03/26."
