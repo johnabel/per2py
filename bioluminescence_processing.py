@@ -1,6 +1,5 @@
 from __future__ import division
 
-from __future__ import division
 # imports
 import numpy  as np
 import scipy as sp
@@ -12,7 +11,7 @@ import matplotlib.pyplot as plt
 from LocalImports import PlotOptions as plo
 from LocalImports import Bioluminescence as blu
 from LocalImports import DecayingSinusoid as dsin
-from LocalImports import ProcessingFunctions_20180326 as pf
+from LocalImports import ProcessingFunctions as pf
 
 #inputs nms pre
 pull_from_imagej = False
@@ -22,12 +21,12 @@ input_ij_extension = '.csv'# edit this
 # do we want plots?
 plotcount = 2
 # for each dataset, this is formatted [descriptor, root filename, color ('Red', or 'Green')]
-input_ij_file_type   = [['Pre_Green', '090917VIPMOP_Pre_Green', 'Green'],
-                        ['Pre_Green', '090917VIPMOP_Pre_Red', 'Red'],
-                        ['TTX_Red', '090917VIPMOP_TTX_Red', 'Red'],
-                        ['TTX_Green', '090917VIPMOP_TTX_Green', 'Green'],
-                        ['Wash Red', '090917VIPMOP_Wash_Red', 'Red'],
-                        ['Wash_Green', '090917VIPMOP_Wash_Green', 'Green']
+input_ij_file_type   = [['Pre_Green', '090917VIPMOP_Pre_Green'],
+                        ['Pre_Green', '090917VIPMOP_Pre_Red'],
+                        ['TTX_Red', '090917VIPMOP_TTX_Red'],
+                        ['TTX_Green', '090917VIPMOP_TTX_Green'],
+                        ['Wash Red', '090917VIPMOP_Wash_Red'],
+                        ['Wash_Green', '090917VIPMOP_Wash_Green']
                         ] # edit this
 
 # list all the datasets

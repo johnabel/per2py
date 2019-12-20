@@ -51,7 +51,7 @@ pip install -U [packagename]
 ```
 
 # Usage
-We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook method is provided for a simplified interface.
+We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook method is provided for a simplified interface, and a command line environment is provided for a more experienced user. A summary of the saved results is provided in the Interpreting Results subsection below.
 
 ## Running analysis in a Jupyter/iPython Notebook
 The Jupyter Notebook provides a simple interface to the computational tools within this package.
@@ -76,21 +76,22 @@ If the data is _not_ being taken from an imageJ file but has already been conver
 locations. The flag for pulling from imageJ should be set to False.
 
 
-## Interpreting results
-The data produced during this analysis includes detrended signal, detrended and denoised signal, z-scored detrended and denoised signal, Lomb-Scargle periodogram results, a sinusoidal approximation to the data, the phases of the sinusoidal approximation, and parameters describing the oscillation for each trajectory provided. These results are exported as `.csv` files in the following manner.
+## Interpreting Results
+The data produced during this analysis includes detrended signal, detrended and denoised signal, z-scored detrended and denoised signal, Lomb-Scargle periodogram results, a sinusoidal approximation to the data, the phases of the sinusoidal approximation, and parameters describing the oscillation for each trajectory provided. These results are exported as `.csv` files in the following manner into the *`analysis_output`* directory.
     
-|    Suffix | Data        |
+|    Filename ends in: | Data        |
 |-----------|-------------|
 |`_signal.csv`| Raw bioluminescence.|
 |`_XY.csv`| Raw location values.|
 | `_signal_detrend.csv`| Data interpolated and detrended via HP filter.|
 | `_signal_detrend_denoise.csv`| Detrended, denoised, 12h truncated data. | 
 |`_XY_detrend_denoise.csv` | Detrended, denoised, 12h truncated locations. | 
-|`_zscore.csv` | z-scored detrended and denoised data |
+|`_zscore.csv` | Z-scored detrended and denoised data. |
 |`_lombscargle.csv`| Normalized Lomb-Scargle periodogram values. |
 |`_cosine.csv`| The sinusoid fit to each cell. Only created if cell is rhythmic.|
 |`_cosine_phases.csv`| The sinusoid phases corresponding to the fit.|
 |`_oscillatory_params.csv`| Rhythmic, estimated phase, normalized LS circadian peak, period (h), amplitude, decay, $R^2$.|
+
 <br><br>
 
 # Step-by-step details on bioluminescence processing
