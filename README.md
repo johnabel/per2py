@@ -4,11 +4,11 @@ This repository contains code for processing SCN color-switching Per2iLuc data i
 Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs.
 
 # Table of Contents
-* [Installation](Installation)
-* [Usage](Usage)
-* [License](License)
-* [Authors](Authors)
-* [Funding](Funding)
+* [Installation](#Installation)
+* [Usage](#Usage)
+* [License](#License)
+* [Authors](#Authors)
+* [Funding](#Funding)
 
 # Installation
 We recommend cloning this repository, or downloading a .zip copy of it. The methods for data analysis default to look for data within the `Demo` directory, and enable the user to direct the analysis at other directories. 
@@ -121,7 +121,7 @@ The data produced during this analysis includes detrended signal, detrended and 
     All rhythmic cells are now fit by a damped sinusoid plus a polynomial (to fit any non-oscillatory trend) using nonlinear least squares. Only the sinusoid data is returned.<br><br>
     
 8. **Export data from the analyses.** 
-    The data produced at most steps of this process is then saved in the output folder, as delineated in the [Usage](Usage). <br><br>
+    The data produced at most steps of this process is then saved in the output folder, as delineated in the [Usage](#Usage). <br><br>
 
 9.  **Generate plots for error-checking.**
     Summaries of the data processing are performed for three cells selected at random. Subpanels are A-F, left to right, top to bottom. (A) Raw bioluminescence data. (B) Raw bioluminescence with trend (gold). (C) Detrended bioluminescence. (D) Eigendecomposition (gold) with threshold for reconstruction (red). (E) Detrended and denoised reconstructed signal. (F) Lomb-Scargle periodogram with rhythmic test in y-axis. (G) Sinusoid fit to data with $R^2$ value in y-axis label. (H) Detrended, denoised, and sine fit plotted simultaneously. These are **saved in the analysis_outputs folder**.
