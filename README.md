@@ -1,9 +1,9 @@
 # Code for per2py data analysis
 This repository contains code for processing color-switching Per2iLuc data in a high-throughput manner, with a manuscript under review. It uses the scientific Python stack to identify and process circadian oscillatory data in a reproducible manner.
 
-## TODO: figure out how to deal with wholebody processing
+Per2iLuc color switching may be useful for studying either cellular in vitro or whole-animal in vivo circadian oscillation. To handle these two scenarios, we have created a suite of data analytics functions tailored to each.
 
-Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs.
+Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs. For any errors, bugs, or questions, please use the Issues board on this Github repository.
 
 # Table of Contents
 * [Installation](#Installation)
@@ -53,18 +53,24 @@ pip install -U [packagename]
 ```
 
 # Usage
-We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook method is provided for a simplified interface, and a command line environment is provided for a more experienced user. A summary of the saved results is provided in the Interpreting Results subsection below.
+We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook method is provided for a simplified interface, and a single Python script is provided for a more experienced user. A summary of the saved results is provided in the Interpreting Results subsection below.
 
 ## Running analysis in a Jupyter/iPython Notebook
-The Jupyter Notebook provides a simple interface to the computational tools within this package.
+The Jupyter Notebook provides a simple interface to the computational tools within this package. For analysis of single-cell data, open the `cellular_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. For analysis of whole-body recordings, including actigraphy, temperature, and humidity, open the `wholebody_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. Evaluate each cell sequentially to perform the data analysis.
+
+Details regarding each of these notebooks are provided below.
 
 ## Running analysis using a terminal and command line
-In addition to a Jupyter Notebook, we have provided a command line interface to the analysis tools.
+In addition to a Jupyter Notebook, we have provided a command line interface to the analysis tools. To run a command (If using conda as above, run `conda activate per2py` in the terminal before running the analysis to ensure the proper environment is used.)
+
+# Analysis of cellular bioluminescence recordings
+
+## Importing data
 
 The data may be imported directly from the imageJ output .xls file. If so, set:
 ```
 pull_from_imagej = True
-input_folder = [path to folder containing data]
+input_folder = [path to directory containing data]
 input_ij_file   = [name of imageJ file with no extension]
 ```
 
@@ -91,7 +97,7 @@ The data produced during this analysis includes detrended signal, detrended and 
 
 <br><br>
 
-# Step-by-step details on bioluminescence processing
+## Step-by-step details for analysis of single-cell data
 1. **Import data.**
     Details on the data import are provided in the instructions section.
 <br><br>
@@ -123,6 +129,16 @@ The data produced during this analysis includes detrended signal, detrended and 
 
 9.  **Generate plots for error-checking.**
     Summaries of the data processing are performed for three cells selected at random. Subpanels are A-F, left to right, top to bottom. (A) Raw bioluminescence data. (B) Raw bioluminescence with trend (gold). (C) Detrended bioluminescence. (D) Eigendecomposition (gold) with threshold for reconstruction (red). (E) Detrended and denoised reconstructed signal. (F) Lomb-Scargle periodogram with rhythmic test in y-axis. (G) Sinusoid fit to data with $R^2$ value in y-axis label. (H) Detrended, denoised, and sine fit plotted simultaneously. These are **saved in the analysis_outputs folder**.
+
+# Analysis of whole-body bioluminescence recordings
+
+## Importing whole-body bioluminescence traces, actigraphy, temperature, and humidity
+
+## Interpreting Results
+
+
+## Step-by-step details for analysis of whole-body data
+
 
 # License
 

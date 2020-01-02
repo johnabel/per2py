@@ -20,24 +20,18 @@ input_extension = '.csv'
 
 # do we want plots?
 plotcount = 2
-# for each dataset, this is the root filename]
-input_files   = ['012218NMS_Green_Pre_Spots in tracks statistics',
-                 '012218NMS_Red_Pre_Spots in tracks statistics',
-                 '012218NMS_Green_TTX_Spots in tracks statistics',
-                 '012218NMS_Red_TTX_Spots in tracks statistics',
-                 '012218NMS_Green_Wash_Spots in tracks statistics',
-                 '012218NMS_Red_Wash_Spots in tracks statistics'] # edit this
-
-
-#
-#
-#                Code below this line should not be edited.
-#
+# for each dataset, this is formatted [descriptor, root filename, color ('Red', or 'Green')]
+input_ij_files   = ['012218NMS_Green_Pre_Spots in tracks statistics',
+                    '012218NMS_Red_Pre_Spots in tracks statistics',
+                    '012218NMS_Green_TTX_Spots in tracks statistics',
+                    '012218NMS_Red_TTX_Spots in tracks statistics',
+                    '012218NMS_Green_Wash_Spots in tracks statistics',
+                    '012218NMS_Red_Wash_Spots in tracks statistics'] # edit this
 
 # list all the datasets
 all_inputs=[]
-for input_fi in input_files:
-    all_inputs.append(cpf.generate_filenames_dict(input_folder, input_fi, 
+for input_ij in input_ij_files:
+    all_inputs.append(cpf.generate_filenames_dict(input_folder, input_ij, 
                                     pull_from_imagej, input_ij_extension=input_extension))
 
 # process the data for every set of inputs
