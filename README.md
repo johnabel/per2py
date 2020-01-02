@@ -64,14 +64,9 @@ The data may be imported directly from the imageJ output .xls file. If so, set:
 pull_from_imagej = True
 input_folder = [path to folder containing data]
 input_ij_file   = [name of imageJ file with no extension]
-data_type = [type of data being imported]
 ```
-Note that data_type will be used to name all future outputs of the file. For example, the raw signal and raw XY tracking will be named:
-```
-raw_signal = output_folder +data_type+'_signal'+output_extension
-raw_xy = output_folder +data_type+'_XY'+output_extension
-```
-If the data is _not_ being taken from an imageJ file but has already been converted into `_signal.csv` and
+
+If the data are _not_ being taken from an imageJ file but has already been converted into `_signal.csv` and
 `_XY.csv` files, one need only adjust `data_type` so that `raw_signal` and `raw_xy` look in the correct
 locations. The flag for pulling from imageJ should be set to False.
 

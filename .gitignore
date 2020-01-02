@@ -1,3 +1,6 @@
+# Data from the paper that does not go in the Demo folder
+PaperData*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
