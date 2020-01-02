@@ -1,9 +1,9 @@
 # Code for per2py data analysis
 This repository contains code for processing color-switching Per2iLuc data in a high-throughput manner, with a manuscript under review. It uses the scientific Python stack to identify and process circadian oscillatory data in a reproducible manner.
 
-Per2iLuc color switching may be useful for studying either cellular in vitro or whole-animal in vivo circadian oscillation. To handle these two scenarios, we have created a suite of data analytics functions tailored to each.
+Per2iLuc color switching may be useful for studying either cellular in vitro or whole-animal in vivo circadian oscillation. To handle these two scenarios, we have created a suite of data analytics functions tailored to each. All code is presented here so that an experienced computational biologist can adapt the code for their specific use.
 
-Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs. For any errors, bugs, or questions, please use the Issues board on this Github repository.
+Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs. For any errors, bugs, or questions, please use the Issues board on this Github repository. It is possible that this code should be adapted for the individual system employed for experimentation. If this is desired, please contact John Abel at jhabel01(at)gmail(dot)com.
 
 # Table of Contents
 * [Installation](#Installation)

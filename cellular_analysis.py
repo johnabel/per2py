@@ -15,23 +15,29 @@ from LocalImports import CellularFunctions as cpf
 
 #inputs nms pre
 pull_from_imagej = True
-input_folder = 'Demo/cellular/scn15_NMSWT_012218/' # edit this
+input_folder = 'Demo/Cellular/scn15_NMSWT_012218/' # edit this
 input_extension = '.csv'
 
 # do we want plots?
 plotcount = 2
-# for each dataset, this is formatted [descriptor, root filename, color ('Red', or 'Green')]
-input_ij_files   = ['012218NMS_Green_Pre_Spots in tracks statistics',
-                    '012218NMS_Red_Pre_Spots in tracks statistics',
-                    '012218NMS_Green_TTX_Spots in tracks statistics',
-                    '012218NMS_Red_TTX_Spots in tracks statistics',
-                    '012218NMS_Green_Wash_Spots in tracks statistics',
-                    '012218NMS_Red_Wash_Spots in tracks statistics'] # edit this
+# for each dataset, this is the root filename]
+input_files   = ['012218NMS_Green_Pre_Spots in tracks statistics',
+                 '012218NMS_Red_Pre_Spots in tracks statistics',
+                 '012218NMS_Green_TTX_Spots in tracks statistics',
+                 '012218NMS_Red_TTX_Spots in tracks statistics',
+                 '012218NMS_Green_Wash_Spots in tracks statistics',
+                 '012218NMS_Red_Wash_Spots in tracks statistics'] # edit this
+
+
+#
+#
+#                Code below this line should not be edited.
+#
 
 # list all the datasets
 all_inputs=[]
-for input_ij in input_ij_files:
-    all_inputs.append(cpf.generate_filenames_dict(input_folder, input_ij, 
+for input_fi in input_files:
+    all_inputs.append(cpf.generate_filenames_dict(input_folder, input_fi, 
                                     pull_from_imagej, input_ij_extension=input_extension))
 
 # process the data for every set of inputs

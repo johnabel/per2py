@@ -744,8 +744,7 @@ def cwt(y, fs, ga=3, be=7, opt_b='exp_sin', opt_m='ban'):
     # Convolution of wavelets and input data
     iT = W.multiply(X)
 
-
-    T = np.fft.ifft(iT.todense(), axis=0)[index, :]
+    T = np.fft.ifft(iT.todense(), axis=0)[np.array(index, dtype=int), :]
 
     return T.T
 
