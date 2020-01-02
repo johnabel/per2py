@@ -15,18 +15,18 @@ from LocalImports import ProcessingFunctions as pf
 
 #inputs nms pre
 pull_from_imagej = True
-input_folder = 'Demo/scn2_VIPBmal1KO_20170909_SGLE1/' # edit this
+input_folder = 'Demo/scn15_NMSWT_012218/' # edit this
 input_extension = '.csv'
 
 # do we want plots?
 plotcount = 2
 # for each dataset, this is formatted [descriptor, root filename, color ('Red', or 'Green')]
-input_ij_files   = ['090917VIPMOP_Pre_Green',
-                    '090917VIPMOP_Pre_Red',
-                    '090917VIPMOP_TTX_Red',
-                    '090917VIPMOP_TTX_Green',
-                    '090917VIPMOP_Wash_Red',
-                    '090917VIPMOP_Wash_Green'] # edit this
+input_ij_files   = ['012218NMS_Green_Pre_Spots in tracks statistics',
+                    '012218NMS_Red_Pre_Spots in tracks statistics',
+                    '012218NMS_Green_TTX_Spots in tracks statistics',
+                    '012218NMS_Red_TTX_Spots in tracks statistics',
+                    '012218NMS_Green_Wash_Spots in tracks statistics',
+                    '012218NMS_Red_Wash_Spots in tracks statistics'] # edit this
 
 # list all the datasets
 all_inputs=[]
