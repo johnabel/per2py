@@ -11,7 +11,7 @@ from __future__ import division
 
 import numpy  as np
 import pandas as pd
-from scipy import signal, interpolate, optimize, sparse
+from scipy import signal, interpolate, optimize, sparse, stats
 from scipy.sparse import dia_matrix, eye as speye
 from scipy.sparse.linalg import spsolve
 import spectrum

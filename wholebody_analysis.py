@@ -93,7 +93,6 @@ mouse1.continuous_wavelet_transform()
 # let's see how phases change over time
 plt.figure()
 plt.plot(mouse1.cwt['activity_es']['x'], np.cos(mouse1.cwt['activity_es']['phase']), 'k', label='Activity')
-#plt.plot(mouse1.cwt['temp_es']['x'], np.cos(mouse1.cwt['temp_es']['phase']), 'b', label='Temperature')
 plt.plot(mouse1.cwt['ryr_es']['x'], np.cos(mouse1.cwt['ryr_es']['phase']), 'r:', label='Red - Muscle')
 # only plot where green is circadian
 good_green = np.where(np.logical_and(mouse1.cwt['gyr_es']['period']>20, 
@@ -107,23 +106,20 @@ plt.legend()
 plt.tight_layout(**plo.layout_pad)
 
 
-
-
-
-pearson_red_green = correlate_signals(mouse1.imaging['xr_UT'], mouse1.imaging['ryr_es'],
+pearson_red_green = wbr.correlate_signals(mouse1.imaging['xr_UT'], mouse1.imaging['ryr_es'],
                             mouse1.imaging['xr_UT'], mouse1.imaging['gyr_es'])
 
-pearson_red_activity = correlate_signals(mouse1.imaging['xr_UT'], 
+pearson_red_activity = wbr.correlate_signals(mouse1.imaging['xr_UT'], 
                                          mouse1.imaging['ryr_es'],
                             mouse1.activity['x_UT'], 
                             mouse1.activity['activity_es'])
 
-pearson_act_temp = correlate_signals(mouse1.activity['x_UT'], 
+pearson_act_temp = wbr.correlate_signals(mouse1.activity['x_UT'], 
                             mouse1.activity['activity_es'],
                             mouse1.TH['x_UT'], 
                             mouse1.TH['temp_es'])
 
-pearson_red_hum = correlate_signals(mouse1.imaging['xr_UT'], 
+pearson_red_hum = wbr.correlate_signals(mouse1.imaging['xr_UT'], 
                             mouse1.imaging['ryr_es'],
                             mouse1.TH['x_UT'], 
                             mouse1.TH['hum_es'])
