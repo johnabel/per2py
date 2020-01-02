@@ -1,5 +1,7 @@
 # Code for per2py data analysis
-This repository contains code for processing SCN color-switching Per2iLuc data in a high-throughput manner, with a manuscript under review. This package uses the scientific Python stack to identify and process circadian oscillatory data in a reproducible manner.
+This repository contains code for processing color-switching Per2iLuc data in a high-throughput manner, with a manuscript under review. It uses the scientific Python stack to identify and process circadian oscillatory data in a reproducible manner.
+
+## TODO: figure out how to deal with wholebody processing
 
 Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs.
 
