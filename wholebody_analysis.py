@@ -4,9 +4,7 @@ Created on Mon Mar 25 13:15:22 2019
 
 @authors: AbelJ ShanY
 
-Here is a rough attempt at correlating signals. Ideas:
-- simple MIC and confusion matrix heatmap
-- use CWT phase to see which have stable relationships
+This code 
 """
 from __future__ import division
 
@@ -25,12 +23,11 @@ from LocalImports import PlotOptions as plo
 from LocalImports import DecayingSinusoid as ds
 from LocalImports import WholeBodyRecording as wbr
 
-importlib.reload(wbr)
 
 # setup the data
-input_folder = 'Data/M1_030119P2R2GALBWT_Piper1/'
+input_folder = 'Demo/WholeBody/M1_030119P2R2GALBWT_Piper1/'
 
-# set up the TH data
+# set up the temperature and humidity data
 imaging_start = '2019-03-12 17:08:01' #time stamp in format like 19/03/01 17:19:30
 imaging_interval = '2 min'
 m1g_file = input_folder+'031219_pump_light_green_liver.xls'
@@ -109,80 +106,7 @@ plt.ylim([-1,1.5])
 plt.legend()
 plt.tight_layout(**plo.layout_pad)
 
-# now - let's try the correlations
-def correlate_signals(t1, d1, t2, d2, metric='pearsonr', max_dist=0.25, return_downsampled_trajectories=False):
-    """
-    Correlates signals using different metrics of correlation. Uses
-    whichever signal is shorter as the reference, and minimizing the 
-    time-distance between samples.
 
-    Arguments
-    ----------
-    t1 : time series 1 (h)
-    d1 : data series 1 
-    t2 : time series 2 (h)
-    d2 : data series 2
-    metric : 'mic' 'pearsonr'
-    max_dist : max time distance to say points are the same, in h 
-               defaults to 0.25
-    """
-    t1t2 = [t1, t2]
-    d1d2 = [d1, d2]
-
-    if all(t1==t2):
-        if metric=='pearsonr':
-            corr = stats.pearsonr(d1,d2)
-        elif metric=='mic':
-            corr = 0
-
-        if return_downsampled_trajectories:
-            return t1,t2,d1,d2,corr
-        else:
-            return corr
-
-    else:
-        # reference is the shorter one, relative is the longer one
-        ref_ind = np.argmin([len(t1), len(t2)])
-        rel_ind = np.argmax([len(t1), len(t2)])
-
-        ref_t = t1t2[ref_ind]
-        ref_d = d1d2[ref_ind]
-        rel_t = t1t2[rel_ind]
-        rel_d = d1d2[rel_ind]
-        
-        rel_t_match = []
-        ref_t_match = []
-        rel_d_match = []
-        ref_d_match = []
-        for ref_idx,ti in enumerate(ref_t):
-            match_idx = np.argmin((rel_t-ti)**2)
-            if np.abs(rel_t[match_idx]-ti) < max_dist:
-                ref_t_match.append(ti)
-                ref_d_match.append(ref_d[ref_idx])
-                rel_t_match.append(rel_t[match_idx])
-                rel_d_match.append(rel_d[match_idx])
-
-        # do the correlations
-        if metric=='pearsonr':
-            corr = stats.pearsonr(ref_d_match, rel_d_match)
-        elif metric=='mic':
-            mm = mp.mine()
-            mm.compute_score(ref_d_match, rel_d_match)
-            corr = mm.mic()
-
-
-        if return_downsampled_trajectories:
-            # sort to get results correct
-            t1t2r = [[], []]
-            t1t2r[ref_ind] = ref_t_match
-            t1t2r[rel_ind] = rel_t_match
-
-            d1d2r = [[], []]
-            d1d2r[ref_ind] = ref_d_match
-            d1d2r[rel_ind] = rel_d_match        
-            return t1,t2,d1,d2,corr
-        else:
-            return corr        
 
 
 

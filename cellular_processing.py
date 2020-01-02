@@ -15,7 +15,7 @@ from LocalImports import CellularFunctions as cpf
 
 #inputs nms pre
 pull_from_imagej = True
-input_folder = 'Demo/cellular/scn15_NMSWT_012218/' # edit this
+input_folder = 'Demo/Cellular/scn15_NMSWT_012218/' # edit this
 input_extension = '.csv'
 
 # do we want plots?
