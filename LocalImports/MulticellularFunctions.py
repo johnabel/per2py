@@ -75,16 +75,13 @@ def load_imagej_file(input_data, raw_signal, raw_xy, input_ij_extension=None):
 
     # x and y are self-evident, cell id is the track_id, mean_intensityXX
     # is the biolum we want
-    useful_frames = ['TRACK_ID', 'POSITION_X', 'POSITION_Y', 'FRAME']
+    useful_frames = ['TRACK_ID', 'POSITION_X', 'POSITION_Y', 'FRAME', 'MEAN_INTENSITY']
 
     # delete the rest
     orig_keys = np.copy(ij_sheet.keys())
     for kdx, key in enumerate(orig_keys):
         if key not in useful_frames:
-            if key[:14]=='MEAN_INTENSITY':
-                ij_sheet.rename(columns={key: 'MEAN_INTENSITY'}, inplace=True)
-            else:
-                del ij_sheet[orig_keys[kdx]]
+            del ij_sheet[orig_keys[kdx]]
     #
 
 

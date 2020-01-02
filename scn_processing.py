@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from LocalImports import PlotOptions as plo
 from LocalImports import Bioluminescence as blu
 from LocalImports import DecayingSinusoid as dsin
-from LocalImports import ProcessingFunctions as pf
+from LocalImports import MulticellularFunctions as mpf
 
 #inputs nms pre
 pull_from_imagej = True
@@ -31,7 +31,7 @@ input_ij_files   = ['012218NMS_Green_Pre_Spots in tracks statistics',
 # list all the datasets
 all_inputs=[]
 for input_ij in input_ij_files:
-    all_inputs.append(pf.generate_filenames_dict(input_folder, input_ij, 
+    all_inputs.append(mpf.generate_filenames_dict(input_folder, input_ij, 
                                     pull_from_imagej, input_ij_extension=input_extension))
 
 # process the data for every set of inputs
@@ -59,36 +59,36 @@ for files_dict in all_inputs:
     # I. IMPORT DATA
     # only perform this step if pull_from_imagej is set to True
     if pull_from_imagej:
-        pf.load_imagej_file(input_data, raw_signal, raw_xy)
+        mpf.load_imagej_file(input_data, raw_signal, raw_xy)
 
-    raw_times, raw_data, locations, header = pf.import_data(raw_signal, raw_xy)
+    raw_times, raw_data, locations, header = mpf.import_data(raw_signal, raw_xy)
 
     # II. INTERPOLATE MISSING PARTS
     # truncate 0 h and interpolate
-    interp_times, interp_data, locations = pf.truncate_and_interpolate(
+    interp_times, interp_data, locations = mpf.truncate_and_interpolate(
         raw_times, raw_data, locations, truncate_t=0)
 
     # III. DETREND USING HP Filter
     #(Export data for presentation of raw tracks with heatmap in Prism.)
-    detrended_times, detrended_data, trendlines = pf.hp_detrend(
+    detrended_times, detrended_data, trendlines = mpf.hp_detrend(
                                         interp_times, interp_data)
 
     # IV. SMOOTHING USING EIGENDECOMPOSITION
     # eigendecomposition
-    denoised_times, denoised_data, eigenvalues = pf.eigensmooth(detrended_times,
+    denoised_times, denoised_data, eigenvalues = mpf.eigensmooth(detrended_times,
         detrended_data, ev_threshold=0.05, dim=40)
     # TRUNCATE 12 INITIAL HOURS
-    final_times, final_data, locations = pf.truncate_and_interpolate(denoised_times,
+    final_times, final_data, locations = mpf.truncate_and_interpolate(denoised_times,
                                     denoised_data, locations, truncate_t=12)
 
     # V. LS PERIODOGRAM TEST FOR RHYTHMICITY
-    lspers, pgram_data, circadian_peaks, lspeak_periods, rhythmic_or_not = pf.LS_pgram(final_times, final_data)
+    lspers, pgram_data, circadian_peaks, lspeak_periods, rhythmic_or_not = mpf.LS_pgram(final_times, final_data)
 
     # VI. GET A SINUSOIDAL FIT TO EACH CELL
     # use final_times, final_data
     # use forcing to ensure period within 1h of LS peak period
     sine_times, sine_data, phase_data, refphases, periods, amplitudes, decays, r2s, meaningful_phases =\
-         pf.sinusoidal_fitting(final_times, final_data, rhythmic_or_not, 
+         mpf.sinusoidal_fitting(final_times, final_data, rhythmic_or_not, 
                                fit_times=raw_times, forced_periods=lspeak_periods)
     # get metrics
     circadian_metrics = np.vstack([rhythmic_or_not, circadian_peaks, refphases, periods, amplitudes,
@@ -185,11 +185,11 @@ for files_dict in all_inputs:
     cellidxs=np.random.randint(len(cell_ids),size=plotcount)
     for cellidx in cellidxs:
         # truly awful syntax
-        pf.plot_result(cellidx, raw_times, raw_data, trendlines, 
+        mpf.plot_result(cellidx, raw_times, raw_data, trendlines, 
                     detrended_times, detrended_data, eigenvalues, 
                     final_times, final_data, rhythmic_or_not, 
                     lspers, pgram_data, sine_times, sine_data, r2s,
-                    input_folder, data_type)
+                    output_folder, data_type)
     print str(np.round(timer(),1))+"s"
 
     print "All data saved. Run terminated successfully for "+data_type+'.\n'
