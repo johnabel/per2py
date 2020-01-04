@@ -93,9 +93,9 @@ mouse1.process_activity_data(binsize=15)
 mouse1.continuous_wavelet_transform()
 
 # perform the correlational analysis for times 24-120, and 216-end
-mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_es', '_es', '_es'], 
+mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_b', '_es', '_es'], 
                          tmin=24, tmax=120, name='start')
-mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_es', '_es', '_es'], 
+mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_b', '_es', '_es'], 
                          tmin=216, name='end')
 
 
