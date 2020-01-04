@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Mon April 1 2019
 
@@ -29,10 +28,11 @@ class WholeBodyRecording(object):
     Class to analyze time series data for whole body PER2iLuc recordings.
     """
 
-    def __init__(self, red_file, green_file, imaging_start, imaging_interval, name=None):
+    def __init__(self, directory, red_file, green_file, imaging_start, imaging_interval, name=None):
         """
         Parameters
         ----------
+        directory : str        
         red_data : np.ndarray
             should contain a single PER2iLuc time series for analysis.
         green_data : np.ndarray
@@ -41,15 +41,17 @@ class WholeBodyRecording(object):
             start of the imaging, in format '2019-03-12 17:08:01'
         imaging_interval : str
             timespan of each image, in formate 'XYZ min'
-        name : str
-            just a name for the dataset
+        name : str, optional
+            A name for the dataset if desired
         """
+
         if name is not None:
             self.name = name
+        self.directory = directory+'/'
 
 
-        red_f = np.genfromtxt(red_file)
-        green_f = np.genfromtxt(green_file)
+        red_f = np.genfromtxt(self.directory+red_file)
+        green_f = np.genfromtxt(self.directory+green_file)
         imaging_times = red_f[1:,0]
         assert len(imaging_times)==len(green_f[1:,0]), "Imaging files of unequal length."
 
@@ -115,15 +117,20 @@ class WholeBodyRecording(object):
         self.imaging[t_post] = xr
 
     def import_temperature_humidity(self, filename, start_time='imaging', droplines=18):
-        """
-        Imports the temperature and humidity file at filename.
-
-        start_time is either "imaging", None, or a date in the format 
-        '2019-03-12 17:08:01'
+        """Imports the temperature and humidity file and links to existing data. Creates self.TH, the temperature and humidity recordings.
+        
+        Parameters
+        ----------
+        filename : str
+            Name of the temperature and humidity file, within self.directory.
+        start_time : str, optional
+            The time at which the temperature and humidity recordings start, in format '2019-03-12 17:08:01'. Defulats to 'imaging', the time at which the imaging also starts.
+        droplines : int, optional
+            Number of lines to discard at the start of the file, by default 18 (which works for the data as in the Demo directory.)
         """
 
         # load the files
-        TH_pd = pd.read_excel(filename, usecols=[0,1,2,3],
+        TH_pd = pd.read_excel(self.directory+filename, usecols=[0,1,2,3],
                               names=['index','date','temp','humidity'])
         TH_pd = TH_pd.drop(range(droplines))
         # if set up as example file, then this is 
@@ -139,7 +146,7 @@ class WholeBodyRecording(object):
             imgstart = pd.to_datetime('2010-01-01 00:00:00')
         else:
             try:
-                imgstart = dp.to_datetime(start_time)
+                imgstart = pd.to_datetime(start_time)
             except:
                 imgstart = pd.to_datetime('2010-01-01 00:00:00')
                 print("Date format not understood, leaving all times.")
@@ -159,17 +166,19 @@ class WholeBodyRecording(object):
         TH['offset_h'] = offset.total_seconds()/60/60
         self.TH = TH
 
-    def import_actogram(self, filename, start_time='imaging', actogram_interval=1,
-                        binsize=None):
-        """
-        Imports the actogram file at filename.
+    def import_actogram(self, filename, start_time='imaging', actogram_interval=1):
+        """Imports the actogram file and attaches it to the object at self.actogram.
 
-        actogram_interval is in minutes
-
-        start_time is either "imaging", None, or a date in the format 
-        '2019-03-12 17:08:01'
+        Parameters
+        ----------
+        filename : str
+            Name of the temperature and humidity file, within self.directory.
+        start_time : str, optional
+            The time at which the actogram start, in format '2019-03-12 17:08:01'. Defulats to 'imaging', the time at which the imaging also starts.
+        actogram_interval : float, optional, defaults to 1
+            The interval of the actogram recording in minutes.
         """
-        act_pd = pd.read_csv(filename, header=None)
+        act_pd = pd.read_csv(self.directory+filename, header=None)
         total_days = act_pd.shape[1]-1
         act_start = pd.to_datetime(act_pd[1][1][3:]+' 00:00:00', dayfirst=True)
 
@@ -180,7 +189,7 @@ class WholeBodyRecording(object):
             imgstart = pd.to_datetime('2010-01-01 00:00:00')
         else:
             try:
-                imgstart = dp.to_datetime(start_time)
+                imgstart = pd.to_datetime(start_time)
             except:
                 imgstart = pd.to_datetime('2010-01-01 00:00:00')
                 print("Date format not understood, leaving all times.")
@@ -253,8 +262,8 @@ class WholeBodyRecording(object):
             self.periodogram['green'] = green_pgram            
 
         # now the eigensmooth
-        et, ered, evalred = eigensmooth(hpt, hp_red)
-        et, egreen, evalgreen = eigensmooth(hpt, hp_green)
+        et, ered, _ = eigensmooth(hpt, hp_red)
+        et, egreen, _ = eigensmooth(hpt, hp_green)
 
         self.imaging[redname+'_es'] = ered
         self.imaging[greenname+'_es'] = egreen
@@ -289,8 +298,8 @@ class WholeBodyRecording(object):
         # put the sine fit data in the sine_data matrix,
         # and same for phase
         # export all phases for heatmap, and other data for rhythmic cells only
-        rphases = (et*2*np.pi/rparams['period']+rparams['phase'])%(2*np.pi)
-        gphases = (et*2*np.pi/gparams['period']+gparams['phase'])%(2*np.pi)
+        # rphases = (et*2*np.pi/rparams['period']+rparams['phase'])%(2*np.pi)
+        # gphases = (et*2*np.pi/gparams['period']+gparams['phase'])%(2*np.pi)
 
         try:
             self.sinusoids
@@ -357,10 +366,9 @@ class WholeBodyRecording(object):
             self.periodogram['hum'] = hum_pgram            
 
         # now the eigensmooth
-        et, etemp, evaltemp = eigensmooth(hpt, hp_temp)
-        et, ehum, evalhum = eigensmooth(hpt, hp_hum)
+        et, etemp, _ = eigensmooth(hpt, hp_temp)
+        et, ehum, _ = eigensmooth(hpt, hp_hum)
 
-        self.TH[xname+'_es'] = et
         self.TH[tempname+'_es'] = etemp
         self.TH[humname+'_es'] = ehum
 
@@ -394,8 +402,8 @@ class WholeBodyRecording(object):
         # put the sine fit data in the sine_data matrix,
         # and same for phase
         # export all phases for heatmap, and other data for rhythmic cells only
-        rphases = (et*2*np.pi/rparams['period']+rparams['phase'])%(2*np.pi)
-        gphases = (et*2*np.pi/gparams['period']+gparams['phase'])%(2*np.pi)
+        # rphases = (et*2*np.pi/rparams['period']+rparams['phase'])%(2*np.pi)
+        # gphases = (et*2*np.pi/gparams['period']+gparams['phase'])%(2*np.pi)
 
         try:
             self.sinusoids
@@ -474,9 +482,7 @@ class WholeBodyRecording(object):
             self.periodogram['act'] = act_pgram
 
         # now the eigensmooth
-        et, eact, evalact = eigensmooth(times, act_zero)
-
-        self.activity[xname+'_es'] = et
+        et, eact, _ = eigensmooth(times, act_zero)
         self.activity[actname+'_es'] = eact
 
         # fit the data with the polynomial+sinusoid
@@ -501,7 +507,7 @@ class WholeBodyRecording(object):
         # put the sine fit data in the sine_data matrix,
         # and same for phase
         # export all phases for heatmap, and other data for rhythmic cells only
-        rphases = (et*2*np.pi/rparams['period']+rparams['phase'])%(2*np.pi)
+        # rphases = (et*2*np.pi/rparams['period']+rparams['phase'])%(2*np.pi)
 
         try:
             self.sinusoids
@@ -518,7 +524,7 @@ class WholeBodyRecording(object):
             act_sin['params'] = rparams
             self.sinusoids['act'] = act_sin
 
-    def continuous_wavelet_transform(self, data='es', shortestperiod=16, longestperiod=32, nvoice=512, be=5):
+    def continuous_wavelet_transform(self, dtype='es', shortestperiod=16, longestperiod=32, nvoice=512, be=5):
         """
         Gives CWT, phase, and period for all data marked with the data label.
         Tries to find r/g/t/h/a and applies CWT to each.
@@ -526,7 +532,7 @@ class WholeBodyRecording(object):
 
         self.cwt = {}
         # imaging data
-        for datatype in ['gyr_'+data, 'ryr_'+data]:
+        for datatype in ['gyr_'+dtype, 'ryr_'+dtype]:
             x = self.imaging['xr_UT']
             try:
                 y = self.imaging[datatype]
@@ -537,7 +543,7 @@ class WholeBodyRecording(object):
                 pass
 
         # t/h data
-        for datatype in ['temp_'+data, 'hum_'+data]:
+        for datatype in ['temp_'+dtype, 'hum_'+dtype]:
             x = self.TH['x_UT']
             try:
                 y = self.TH[datatype]
@@ -578,6 +584,109 @@ class WholeBodyRecording(object):
         if legend:
             plt.legend()
         return ax
+    
+    def correlate_signals(self, signals, dtypes, metric='pearsonr', max_dist=0.25, return_downsampled_trajectories=False):
+        """
+        Correlates signals using different metrics of correlation. Uses
+        whichever signal is shorter as the reference, and minimizing the 
+        time-distance between samples. Currently only uses Pearson's r.
+
+        Arguments
+        ----------
+        signals : list
+            The signals to correlate. Options: 'activity', 'biolum', 'TH'
+        dtypes : list of str
+            The type of data the analysis is performed on. Must be the same length as signals.
+        metric : 'pearsonr'
+            Statistic used for correlation. Currently only pearson's r is implemented. Others may be added simply here.
+        max_dist : float, defaults to 0.25
+            Maximum time distance to say timepoints are identical, in h. 
+        """
+
+        ts = [] # timeseries
+        ds = [] # dataseries
+        ss = [] # sorted signals
+
+        for si, sig in enumerate(signals):
+            if sig=='activity':
+                ts.append(self.activity['x_UT'])
+                ds.append(self.activity['activity'+dtypes[si]])
+                ss.append('activity'+dtypes[si])
+            if sig=='biolum':
+                ti = self.imaging['xr_UT']
+                gi = self.imaging['gyr'+dtypes[si]]
+                ri = self.imaging['ryr'+dtypes[si]]
+                assert len(ti)==len(gi)==len(ri), "Time mismatch in biolum data."
+                ts.append(ti)
+                ts.append(ti)
+                ds.append(gi)
+                ds.append(ri)
+                ss.append('biolum-green')
+                ss.append('biolum-red')
+            if sig=='TH':
+                ts.append(self.TH['x_UT'])
+                ts.append(self.TH['x_UT'])
+                ds.append(self.TH['temp'+dtypes[si]])
+                ds.append(self.TH['hum'+dtypes[si]])
+                ss.append('temp')
+                ss.append('hum')
+
+        corrmat = np.zeros([len(ds), len(ds)])
+        pmat = np.ones([len(ds), len(ds)])
+
+        for d1i in np.arange(len(ds)):
+            for d2i in np.arange(len(ds)):
+                if d1i <= d2i:
+
+                    # get which data we are correlating
+                    t1 = ts[d1i]
+                    t2 = ts[d2i]
+                    d1 = ds[d1i]
+                    d2 = ds[d2i]
+                    t1t2 = [t1, t2]
+                    d1d2 = [d2, d2]
+
+                    samelist = False
+                    if len(t1)==len(t2):
+                        if all(t1==t2):
+                            samelist = True
+                    
+                    if samelist==True:
+                        if metric=='pearsonr':
+                            corrmat[d1i, d2i], pmat[d1i, d2i] = stats.pearsonr(d1, d2)
+                        else:
+                            print "Method of correlation not implemented."
+
+                    else:
+                        # reference is the shorter one, relative is the longer one
+                        ref_ind = np.argmin([len(t1), len(t2)])
+                        rel_ind = np.argmax([len(t1), len(t2)])
+
+                        ref_t = t1t2[ref_ind]
+                        ref_d = d1d2[ref_ind]
+                        rel_t = t1t2[rel_ind]
+                        rel_d = d1d2[rel_ind]
+                        
+                        rel_t_match = []
+                        ref_t_match = []
+                        rel_d_match = []
+                        ref_d_match = []
+                        for ref_idx,ti in enumerate(ref_t):
+                            match_idx = np.argmin((rel_t-ti)**2)
+                            if np.abs(rel_t[match_idx]-ti) < max_dist:
+                                ref_t_match.append(ti)
+                                ref_d_match.append(ref_d[ref_idx])
+                                rel_t_match.append(rel_t[match_idx])
+                                rel_d_match.append(rel_d[match_idx])
+
+                        # do the correlations
+                        if metric=='pearsonr':
+                            corrmat[d1i, d2i], pmat[d1i, d2i] = stats.pearsonr(ref_d_match, rel_d_match)
+                        else:
+                            print "Method of correlation not implemented." 
+
+        self.corrmat = {'ps': pmat, 'corr': corrmat, 'names':ss}    
+
 
 
 
@@ -665,12 +774,12 @@ def eigensmooth(times, data, ev_threshold=0.05, dim=600, min_ev=2):
     align, atype = alignment(d1, denoised, d=dim, dstart=96)
 
     # fix alignment if leading nans
-    nanshift=0
     if np.isnan(data[0]):
         nanshift=np.argmin(np.isnan(data))
+    else: nanshift = 0
 
     # get the correctly-shaped denoised data
-    denoised = denoised[align:align+len(d1)]*atype
+    denoised = denoised[nanshift+align:nanshift+align+len(d1)]*atype
 
     return times, denoised, evals
 
@@ -771,75 +880,4 @@ def periodogram(x, y, period_low=1, period_high=60, res=200):
     pgram_norm = pgram *2 / (len(x) * var)
     return periods, pgram_norm, significance
 
-# now - let's try the correlations
-def correlate_signals(t1, d1, t2, d2, metric='pearsonr', max_dist=0.25, return_downsampled_trajectories=False):
-    """
-    Correlates signals using different metrics of correlation. Uses
-    whichever signal is shorter as the reference, and minimizing the 
-    time-distance between samples. Currently only uses Pearson's r.
-
-    Arguments
-    ----------
-    t1 : time series 1 (h)
-    d1 : data series 1 
-    t2 : time series 2 (h)
-    d2 : data series 2
-    metric : 'pearsonr'
-    max_dist : max time distance to say points are the same, in h 
-               defaults to 0.25
-    """
-    t1t2 = [t1, t2]
-    d1d2 = [d1, d2]
-
-    if all(t1==t2):
-        if metric=='pearsonr':
-            corr = stats.pearsonr(d1,d2)
-
-        if return_downsampled_trajectories:
-            return t1,t2,d1,d2,corr
-        else:
-            return corr
-
-    else:
-        # reference is the shorter one, relative is the longer one
-        ref_ind = np.argmin([len(t1), len(t2)])
-        rel_ind = np.argmax([len(t1), len(t2)])
-
-        ref_t = t1t2[ref_ind]
-        ref_d = d1d2[ref_ind]
-        rel_t = t1t2[rel_ind]
-        rel_d = d1d2[rel_ind]
-        
-        rel_t_match = []
-        ref_t_match = []
-        rel_d_match = []
-        ref_d_match = []
-        for ref_idx,ti in enumerate(ref_t):
-            match_idx = np.argmin((rel_t-ti)**2)
-            if np.abs(rel_t[match_idx]-ti) < max_dist:
-                ref_t_match.append(ti)
-                ref_d_match.append(ref_d[ref_idx])
-                rel_t_match.append(rel_t[match_idx])
-                rel_d_match.append(rel_d[match_idx])
-
-        # do the correlations
-        if metric=='pearsonr':
-            corr = stats.pearsonr(ref_d_match, rel_d_match)
-        elif metric=='mic':
-            mm = mp.mine()
-            mm.compute_score(ref_d_match, rel_d_match)
-            corr = mm.mic()
-
-
-        if return_downsampled_trajectories:
-            # sort to get results correct
-            t1t2r = [[], []]
-            t1t2r[ref_ind] = ref_t_match
-            t1t2r[rel_ind] = rel_t_match
-
-            d1d2r = [[], []]
-            d1d2r[ref_ind] = ref_d_match
-            d1d2r[rel_ind] = rel_d_match        
-            return t1,t2,d1,d2,corr
-        else:
-            return corr        
+      

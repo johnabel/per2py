@@ -8,6 +8,8 @@ Below, please find instructions for the use of this package, and a step-by-step 
 # Table of Contents
 * [Installation](#Installation)
 * [Usage](#Usage)
+* [Analysis of cellular bioluminescence recordings](#Analysis-of-cellular-bioluminescence-recordings)
+* [Analysis of whole-body bioluminescence recordings](#Analysis-of-whole-body-bioluminescence-recordings)
 * [License](#License)
 * [Authors](#Authors)
 * [Funding](#Funding)
@@ -53,15 +55,16 @@ pip install -U [packagename]
 ```
 
 # Usage
-We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook method is provided for a simplified interface, and a single Python script is provided for a more experienced user. A summary of the saved results is provided in the Interpreting Results subsection below.
+We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook is provided for a simplified interface to the standardized tools for analysis of single-cell data, and a Python script is provided for a more experienced user. Likewise, a Jupyter notebook is provided for analysis of whole-body circadian recordings, and a Python script is also provided for the experienced user. We note that whole-body analysis of circadian data is less readily standardized, and so these scripts likely should be modified for individual use. Example data for each script is included in the `Demo` directory.
+A summary of the saved results is provided in the Interpreting Results subsection below. 
 
 ## Running analysis in a Jupyter/iPython Notebook
 The Jupyter Notebook provides a simple interface to the computational tools within this package. For analysis of single-cell data, open the `cellular_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. For analysis of whole-body recordings, including actigraphy, temperature, and humidity, open the `wholebody_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. Evaluate each cell sequentially to perform the data analysis.
 
-Details regarding each of these notebooks are provided below.
+Details regarding the computations performed in each of these notebooks are provided below.
 
 ## Running analysis using a terminal and command line
-In addition to a Jupyter Notebook, we have provided a command line interface to the analysis tools. To run a command (If using conda as above, run `conda activate per2py` in the terminal before running the analysis to ensure the proper environment is used.)
+In addition to a Jupyter Notebook, we have provided a Python script interface to the analysis tools. To run this code, adjust the lines near the top of the file, and do `python [script_name].py` to run the code. We note that the user may want to adjust some parameters (e.g., sampling interval) before use. If using conda as above, run `conda activate per2py` in the terminal before running the analysis to ensure the proper environment is used.
 
 # Analysis of cellular bioluminescence recordings
 

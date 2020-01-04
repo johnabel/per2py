@@ -214,61 +214,12 @@ class Bioluminescence(object):
 
         self.cwt = cwt
 
-
     def reset(self):
         """ reset values in x and y to the raw values used when
         initiating the class """
         self.x = self.xvals['raw']
         self.y = self.yvals['raw']
 
-
-
-    def plot_dwt_components(self, ax, space=1.0, bins=None,
-                            baselines=None):
-        """ Plot the decomposition from the dwt on the same set of axes,
-        similar to figure 4 in DOI:10.1177/0748730411416330. space is
-        relative spacing to leave between each component, bins is a
-        boolean numpy array which specifies which components to plot
-        (default is all bins) """
-
-        if bins is None:
-            bins = np.array([True]*self.dwt_bins)
-        components = np.array(self.dwt['components'])[bins]
-
-        if baselines is None:
-            # Assume that dwt breakdown will be part of a shared x/y
-            # subplot
-
-            baselines = [0,]
-            last_component = np.zeros(components[0].shape)
-
-            spacing = space*(((components.max(1) -
-                             components.min(1)).sum())/self.dwt_bins)
-
-            for c in components:
-                width = np.abs((c-last_component).min()) + spacing
-                baselines += [width + baselines[-1]]
-                last_component = c
-
-            baselines = np.array(baselines[1:])
-            self.dwt['plot_baselines'] = baselines
-
-            periods    = np.array(self.dwt['period_bins'])
-            period_str = format_number(round_sig(periods))
-
-            ax.set_yticks(baselines)
-            ax.set_xlim([self.x.min(), self.x.max()])
-            ax.set_ylim([0, baselines[-1] + components[-1].max() +
-                         spacing])
-            ax.set_yticklabels([pr[0] + 'h - ' + pr[1] +'h' for pr in
-                                period_str])
-
-
-        components = components + np.atleast_2d(baselines).T
-        for comp, color in zip(components, color_range(self.dwt_bins)):
-            ax.plot(self.x, comp, color=color)
-
-        return ax
 
     def power_in_bin(self):
         """Determines the relative fraction of power in a given

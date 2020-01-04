@@ -18,42 +18,43 @@ from LocalImports import PlotOptions as plo
 from LocalImports import Bioluminescence as blu
 from LocalImports import DecayingSinusoid as dsin
 
-def generate_filenames_dict(input_folder, input_file,
+def generate_filenames_dict(input_dir, input_file,
                         pull_from_imagej, input_ij_extension='.csv'):
     """
     Creates dict of input data
     """
-    input_dict = {'input_folder':input_folder,
+    input_dict = {'input_dir':input_dir,
                   'data_type':input_file,
                   'pull_from_imagej':pull_from_imagej,
                   'input_ij_file':input_file,
                   'input_ij_extension':input_ij_extension}
 
     #inputs - autoset
-    input_dict['input_data'] = input_folder+input_file+input_ij_extension
+    input_dict['input_data'] = input_dir+input_file+input_ij_extension
     data_type = input_file
 
     #outputs - general
     output_extension = '.csv'
-    output_folder = input_folder+'analysis_output/'
+    output_dir = input_dir+'analysis_output/'
     try:
-        os.mkdir(output_folder)
+        os.mkdir(output_dir)
     except OSError:
         pass
 
     # outputs - locations of raw data
-    input_dict['raw_signal'] = output_folder +data_type+'_signal'+output_extension
-    input_dict['raw_xy'] = output_folder +data_type+'_XY'+output_extension
+    input_dict['raw_signal'] = output_dir +data_type+'_signal'+output_extension
+    input_dict['raw_xy'] = output_dir +data_type+'_XY'+output_extension
 
     # outputs - processed data: hodrick-prescott detrend, and hp detrend plus eigensmoothing
-    input_dict['output_detrend'] = output_folder+data_type+'_signal_detrend'+output_extension
-    input_dict['output_detrend_smooth'] = output_folder+data_type+'_signal_detrend_denoise'+output_extension
-    input_dict['output_detrend_smooth_xy'] = output_folder+data_type+'_XY'+'_detrend_denoise'+output_extension
-    input_dict['output_pgram'] = output_folder+data_type+'_lombscargle'+output_extension
-    input_dict['output_cosine'] = output_folder+data_type+'_cosine'+output_extension
-    input_dict['output_phases'] = output_folder+data_type+'_cosine_phases'+output_extension
-    input_dict['output_cosine_params'] = output_folder+data_type+'_oscillatory_params'+output_extension
-    input_dict['output_zscore'] = output_folder+data_type+'_zscore'+output_extension
+    input_dict['output_dir'] = output_dir
+    input_dict['output_detrend'] = output_dir+data_type+'_signal_detrend'+output_extension
+    input_dict['output_detrend_smooth'] = output_dir+data_type+'_signal_detrend_denoise'+output_extension
+    input_dict['output_detrend_smooth_xy'] = output_dir+data_type+'_XY'+'_detrend_denoise'+output_extension
+    input_dict['output_pgram'] = output_dir+data_type+'_lombscargle'+output_extension
+    input_dict['output_cosine'] = output_dir+data_type+'_cosine'+output_extension
+    input_dict['output_phases'] = output_dir+data_type+'_cosine_phases'+output_extension
+    input_dict['output_cosine_params'] = output_dir+data_type+'_oscillatory_params'+output_extension
+    input_dict['output_zscore'] = output_dir+data_type+'_zscore'+output_extension
     return input_dict
 
 def load_imagej_file(input_data, raw_signal, raw_xy, input_ij_extension=None):
@@ -229,7 +230,7 @@ def truncate_and_interpolate(times, data, locations, truncate_t=12,
     locations = locations[start:]
 
     # first, find where nans are in the data
-    h1, h2 = blu.nan_helper(data)
+    h1, _ = blu.nan_helper(data)
 
     # create output data
     outdata = np.nan*np.ones(data.shape)
@@ -306,7 +307,7 @@ def butterworth_lowpass(times, data, cutoff_period=4):
         # copy data for editing
         idata = np.copy(data[:,idx])
         valid = ~np.isnan(idata)
-        filtts, filtdata = blu.lowpass_filter(times[valid], idata[valid],
+        _, filtdata = blu.lowpass_filter(times[valid], idata[valid],
                                         cutoff_period=cutoff_period)
 
         # subtrect baseline from recording
@@ -414,7 +415,7 @@ def eigensmooth(times, detrended_data, ev_threshold=0.05, dim=40, min_ev=2):
         eigenvalues_list.append(evals/np.sum(evals))
 
     print str(np.round(timer(),1))+"s"
-    return times, denoised_data, eigenvalues_list
+    return t1, denoised_data, eigenvalues_list
 
 def sinusoidal_fitting(times, data, rhythmic_or_not, fit_times=None,
                        forced_periods=None):
@@ -484,9 +485,9 @@ def sinusoidal_fitting(times, data, rhythmic_or_not, fit_times=None,
     print str(np.round(timer(),1))+"s"
     return fit_times, sine_data, phase_data, phases, periods, amplitudes, decays, pseudo_r2s, meaningful_phases
 
-def plot_result(cellidx, raw_times, raw_data, trendlines, detrended_times, detrended_data, eigenvalues, final_times, final_data, rhythmic_or_not, pers, pgram_data, sine_times, sine_data, r2s, output_folder, data_type):
+def plot_result(cellidx, raw_times, raw_data, trendlines, detrended_times, detrended_data, eigenvalues, final_times, final_data, rhythmic_or_not, pers, pgram_data, sine_times, sine_data, r2s, output_dir, data_type):
     """
-    Plotting utility to plot ALL data at once. A bit of a mess.
+    Plotting utility to plot ALL data at once. This plotting function is rather messy but functional.
     """
     plo.PlotOptions(ticks='in')
     fig = plt.figure(figsize=(4,7))
@@ -545,6 +546,6 @@ def plot_result(cellidx, raw_times, raw_data, trendlines, detrended_times, detre
     hx.set_ylabel('Biolum (AU)')
 
     plt.tight_layout(**plo.layout_pad)
-    plt.savefig(output_folder+data_type+'_cell'+str(cellidx)+'.png', dpi=300)
+    plt.savefig(output_dir+data_type+'_cell'+str(cellidx)+'.png', dpi=300)
     plt.close()
     plt.clf()
