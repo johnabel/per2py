@@ -25,7 +25,7 @@ from . import Bioluminescence as blu
 
 class WholeBodyRecording(object):
     """
-    Class to analyze time series data for whole body PER2iLuc recordings.
+    Class to analyze time series data for whole body Per2iLuc recordings.
     """
 
     def __init__(self, directory, red_file, green_file, imaging_start, imaging_interval, name=None):
@@ -33,16 +33,17 @@ class WholeBodyRecording(object):
         Parameters
         ----------
         directory : str        
+            The path to the folder that contains the data files.
         red_data : np.ndarray
-            should contain a single PER2iLuc time series for analysis.
+            Should contain a single PER2iLuc time series for analysis.
         green_data : np.ndarray
-            should contain a single PER2iLuc time series for analysis.
+            Should contain a single PER2iLuc time series for analysis.
         imaging_start : str
-            start of the imaging, in format '2019-03-12 17:08:01'
+            Date-time start of the imaging, in format '2019-03-12 17:08:01'.
         imaging_interval : str
-            timespan of each image, in formate 'XYZ min'
+            Timespan of each image, in format 'XYZ min'.
         name : str, optional
-            A name for the dataset if desired
+            A name for the dataset if desired.
         """
 
         if name is not None:
@@ -61,30 +62,47 @@ class WholeBodyRecording(object):
         xi = pd.date_range(imaging_start, periods=len(ry), freq=imaging_interval)
 
         imaging = {}
-        imaging['ry'] = ry
-        imaging['gy'] = gy
-        imaging['xi'] = xi
+        imaging['red'] = ry
+        imaging['green'] = gy
+        imaging['t_imaging'] = xi
         self.imaging = imaging
         self.imaging_start = imaging_start
         self.imaging_interval = imaging_interval
         self.corrmat = {}
     
-    def excise_imaging_times(self, intervals, t_pre='xr', red_pre='ryr', green_pre='gyr', t_post='xr', red_post='ryr', green_post='gyr', cooldown_ext=5):
-        """
-        Cuts times. By default, it operates on and modifies xr, ryr, gyr. If these do
-        not exist, they are created.
-        """
+    def excise_imaging_times(self, intervals, t_pre='t_imaging', red_pre='red', green_pre='green', t_post='t_excised', red_post='red_excised', green_post='green_excised', cooldown_ext=5):
+        """Cuts times where the signal is interfered with due to light in the animal's cage. By default, it operates on and modifies t_imaging, red, green, and creates t_excised, red_excised, and green_excised in the self.imaging dict.
+        
+        Parameters
+        ----------
+        intervals : list of lists of length 2
+            A list of lists, where each list contains the times and dates between which the data should be excised. For example, [['2019-03-01 07:52:00', '2019-03-01 08:24:00']].
+        t_pre : str, optional
+            Key for timeseries in the self.imaging dictionary upon which the excision operates, by default 't_imaging'
+        red_pre : str, optional
+            Key for red series in the self.imaging dictionary upon which the excision operates, by default 'red'
+        green_pre : str, optional
+            Key for green series in the self.imaging dictionary upon which the excision operates, by default 'green'
+        t_post : str, optional
+            Key for placing the timeseries corresponding to the excised data into the self.imaging dict, by default 't_excised'
+        red_post : str, optional
+            Key for placing the excised red data into the self.imaging dict, by default 'red_excised'
+        green_post : str, optional
+            Key for placing the excised green data into the self.imaging dict, by default 'green_excised'
+        cooldown_ext : int, optional
+            Time, in minutes, where the data should be excised following the end of a light epoch due to artifact, by default 5
+        """        
 
         # if pre is not set, use the already-truncated data
         # if already-truncated data does not exist, take the raw
         if t_pre not in self.imaging.keys():
-            self.imaging[t_pre] = self.imaging['xi']
+            self.imaging[t_pre] = self.imaging['t_imaging']
 
         if red_pre not in self.imaging.keys():
-            self.imaging[red_pre] = self.imaging['ry']
+            self.imaging[red_pre] = self.imaging['red']
 
         if green_pre not in self.imaging.keys():
-            self.imaging[green_pre] = self.imaging['gy']
+            self.imaging[green_pre] = self.imaging['green']
         
         # get data for editing
         xr = self.imaging[t_pre]
@@ -107,32 +125,32 @@ class WholeBodyRecording(object):
 
         # by default drop it in these
         if t_post is None:
-            t_post = 'xr'
+            t_post = 't_excised'
         if red_post is None:
-            red_post = 'ryr'
+            red_post = 'red_excised'
         if green_post is None:
-            green_post is 'gyr'
+            green_post is 'green_excised'
 
         self.imaging[red_post] = y1r
         self.imaging[green_post] = y2r
         self.imaging[t_post] = xr
 
     def import_temperature_humidity(self, filename, start_time='imaging', droplines=18):
-        """Imports the temperature and humidity file and links to existing data. Creates self.TH, the temperature and humidity recordings.
+        """Imports the temperature and humidity file and links to existing data. Creates self.TH, a dictionary of the temperature and humidity recordings.
         
         Parameters
         ----------
         filename : str
             Name of the temperature and humidity file, within self.directory.
         start_time : str, optional
-            The time at which the temperature and humidity recordings start, in format '2019-03-12 17:08:01'. Defulats to 'imaging', the time at which the imaging also starts.
+            The time at which the temperature and humidity recordings start, in format '2019-03-12 17:08:01', by default, 'imaging', the time at which the imaging also starts.
         droplines : int, optional
-            Number of lines to discard at the start of the file, by default 18 (which works for the data as in the Demo directory.)
+            Number of lines to discard at the start of the file, by default 18 (which works for the data as in the Demo directory).
         """
 
         # load the files
         TH_pd = pd.read_excel(self.directory+filename, usecols=[0,1,2,3],
-                              names=['index','date','temp','humidity'])
+                              names=['index', 'date', 'temp', 'humidity'])
         TH_pd = TH_pd.drop(range(droplines))
         # if set up as example file, then this is 
         # the correct number of rows to drop
@@ -162,7 +180,7 @@ class WholeBodyRecording(object):
         TH = {}
         TH['temp'] = tempr
         TH['hum'] = humr
-        TH['x'] = xthr
+        TH['t'] = xthr
         TH['interval_h'] = interval.total_seconds()/60/60
         TH['offset_h'] = offset.total_seconds()/60/60
         self.TH = TH
@@ -215,22 +233,28 @@ class WholeBodyRecording(object):
         offset_h = offset.total_seconds()/60/60
 
         activity = {}
-        activity['x'] = xar
+        activity['t'] = xar
         activity['activity'] = actr
         activity['interval_h'] = interval_h
         activity['offset_h'] = offset_h
         self.activity = activity
 
 
-    def process_imaging_data(self, xname, redname, greenname, lsperiod_fit=False):
+    def process_imaging_data(self, tname, redname, greenname, lsperiod_fit=False):
+        """Performs the analysis of the PER2iLuc data. Consists of a Hodrick-Prescott detrend, a Lomb-Scargle periodogram test for rhythmicity, a smoothing via eigendecomposition, fitting to a cosine function, and returning relevant results in the self.imaging, self.periodogram, and self.sinusoid dictionaries. Importantly, this results in a timeseries with the ending '_UT' which denotes that it is in universal time (i.e., time since the start of the imaging).
+        
+        Parameters
+        ----------
+        tname : str
+            Key for the timeseries in the self.imaging dict to be used.
+        redname : str
+            Key for the red series in the self.imaging dict to be used.
+        greenname : str
+            Key for the green series in the self.imaging dict to be used.
+        lsperiod_fit : bool, optional
+            If True, bounds the resulting sinusoid to have a period within 1h of LSPgram. By default False
         """
-        Performs the analysis of the PER2iLuc data. The xname, redname, 
-        greenname arguments tell which of the dict to look at.
-
-        If lsperiod_fit, bounds the resulting sinusoid to have a 
-        period within 1h of LSPgram.
-        """
-        x = self.imaging[xname]
+        x = self.imaging[tname]
         red = self.imaging[redname]
         green = self.imaging[greenname]
 
@@ -239,7 +263,7 @@ class WholeBodyRecording(object):
         timediffs_h = [td.total_seconds()/60/60 for td in timediffs]
         times = np.hstack([0,np.cumsum(timediffs_h)])
         # save times that relate to other measurements
-        self.imaging[xname+'_UT']  = times
+        self.imaging[tname+'_UT']  = times
 
         hpt, hp_red, hp_redb = hp_detrend(times, red)
         hpt, hp_green, hp_greenb = hp_detrend(times, green)
@@ -327,22 +351,28 @@ class WholeBodyRecording(object):
             self.sinusoids['green'] = green_sin
 
 
-    def process_temp_hum_data(self, xname='x', tempname='temp', humname='hum', lsperiod_fit=False):
+    def process_temp_hum_data(self, tname='t', tempname='temp', humname='hum', lsperiod_fit=False):
+        """Performs the analysis of the temperature and humidity data. May need adjusting depending on file format. Consists of a Hodrick-Prescott detrend, a Lomb-Scargle periodogram test for rhythmicity, a smoothing via eigendecomposition, fitting to a cosine function, and returning relevant results in the self.TH, self.periodogram, and self.sinusoid dictionaries. Importantly, this results in a timeseries with the ending '_UT' which denotes that it is in universal time (i.e., time since the start of the imaging).
+        
+        Parameters
+        ----------
+        tname : str, optional
+            Key for the timeseries in the self.imaging dict to be used, by default 't'
+        tempname : str
+            Key for the temperature series in the self.imaging dict to be used, by default 'temp'
+        humname : str
+            Key for the humidity series in the self.imaging dict to be used, by default 'hum'
+        lsperiod_fit : bool, optional
+            If True, bounds the resulting sinusoid to have a period within 1h of LSPgram. By default False
         """
-        Performs the analysis of the temperature and humidity data. The xname, tempname, 
-        humname arguments tell which of the dict to look at.
-
-        If lsperiod_fit, bounds the resulting sinusoid to have a 
-        period within 1h of LSPgram.
-        """
-        x = self.TH[xname]
+        x = self.TH[tname]
         temp = self.TH[tempname]
         hum = self.TH[humname]
 
         # convert interval into float
         interval_float = self.TH['interval_h']
         times = np.arange(len(x))*interval_float+self.TH['offset_h'] # I think
-        self.TH[xname+'_UT'] = times
+        self.TH[tname+'_UT'] = times
 
         hpt, hp_temp, hp_tempb = hp_detrend(times, temp)
         hpt, hp_hum, hp_humb = hp_detrend(times, hum)
@@ -430,9 +460,9 @@ class WholeBodyRecording(object):
             hum_sin['params'] = gparams
             self.sinusoids['hum'] = hum_sin
 
-    def process_activity_data(self, xname='x', actname='activity', lsperiod_fit=False,                      binsize=None):
+    def process_activity_data(self, tname='x', actname='activity', lsperiod_fit=False,                      binsize=None):
         """
-        Performs the analysis of the activity data. The xname, actname
+        Performs the analysis of the activity data. The tname, actname
         arguments tell which of the dict to look at.
 
         If lsperiod_fit, bounds the resulting sinusoid to have a 
@@ -442,7 +472,7 @@ class WholeBodyRecording(object):
         intervals. The circadian phase error for 15-min bins is at most 
         0.065 rad.
         """
-        x = self.activity[xname]
+        x = self.activity[tname]
         act = self.activity[actname]
 
         # convert interval into float
@@ -464,7 +494,7 @@ class WholeBodyRecording(object):
 
 
 
-        self.activity[xname+'_UT'] = times
+        self.activity[tname+'_UT'] = times
 
         # get and remove baseline
         actb = np.mean(act)
@@ -533,8 +563,8 @@ class WholeBodyRecording(object):
 
         self.cwt = {}
         # imaging data
-        for datatype in ['gyr_'+dtype, 'ryr_'+dtype]:
-            x = self.imaging['xr_UT']
+        for datatype in ['green_excised_'+dtype, 'red_excised_'+dtype]:
+            x = self.imaging['t_excised_UT']
             try:
                 y = self.imaging[datatype]
                 cwt = blu.continuous_wavelet_transform(x,y,shortestperiod=shortestperiod, longestperiod=longestperiod, nvoice=nvoice, be=be)
@@ -615,9 +645,9 @@ class WholeBodyRecording(object):
                 ds.append(self.activity['activity'+dtypes[si]][np.logical_and(ti>tmin, ti<tmax)])
                 ss.append('activity'+dtypes[si])
             if sig=='biolum':
-                ti = self.imaging['xr_UT']
-                gi = self.imaging['gyr'+dtypes[si]]
-                ri = self.imaging['ryr'+dtypes[si]]
+                ti = self.imaging['t_excised_UT']
+                gi = self.imaging['green_excised'+dtypes[si]]
+                ri = self.imaging['red_excised'+dtypes[si]]
                 assert len(ti)==len(gi)==len(ri), "Time mismatch in biolum data."
                 ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
                 ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
