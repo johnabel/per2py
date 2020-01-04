@@ -4,7 +4,7 @@ Created on Mon Mar 25 13:15:22 2019
 
 @authors: AbelJ ShanY
 
-This code is a basic analysis of some data from 
+This code is a basic analysis of whole-body bioluminescence data.
 """
 from __future__ import division
 
@@ -18,6 +18,8 @@ from scipy import interpolate, signal, stats
 
 from matplotlib import gridspec
 import matplotlib.pyplot as plt
+import prettyplotlib as ppl
+from prettyplotlib import brewer2mpl
 
 from LocalImports import PlotOptions as plo
 from LocalImports import DecayingSinusoid as ds
@@ -90,8 +92,11 @@ mouse1.process_activity_data(binsize=15)
 # perform the cwt for getting phase info
 mouse1.continuous_wavelet_transform()
 
-# perform the correlational analysis
-mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_es', '_es', '_es'])
+# perform the correlational analysis for times 24-120, and 216-end
+mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_es', '_es', '_es'], 
+                         tmin=24, tmax=120, name='start')
+mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_es', '_es', '_es'], 
+                         tmin=216, name='end')
 
 
 # let's see how phases change over time
@@ -109,4 +114,30 @@ plt.ylim([-1,1.5])
 plt.legend()
 plt.tight_layout(**plo.layout_pad)
 
-# and finally, let's see how different signals are correlated
+# and finally, let's see how different signals are correlated at the start and at the end of the experiment
+
+fig = plt.figure()
+bx = plt.subplot()
+red_purple = brewer2mpl.get_map('RdBu', 'Diverging', 9).mpl_colormap
+ppl.pcolormesh(fig, bx, mouse1.corrmat['start']['corr'], cmap=red_purple, 
+               xticklabels = mouse1.corrmat['start']['names'],
+               yticklabels = mouse1.corrmat['start']['names'], vmax=1, vmin=-1)
+bx.xaxis.tick_top()
+plt.xticks(rotation=90)
+for tic in bx.xaxis.get_major_ticks():
+    tic.tick1On = tic.tick2On = False
+plt.gca().invert_yaxis()
+plt.tight_layout(**plo.layout_pad)
+
+fig = plt.figure()
+bx = plt.subplot()
+red_purple = brewer2mpl.get_map('RdBu', 'Diverging', 9).mpl_colormap
+ppl.pcolormesh(fig, bx, mouse1.corrmat['end']['corr'], cmap=red_purple, 
+               xticklabels = mouse1.corrmat['end']['names'],
+               yticklabels = mouse1.corrmat['end']['names'], vmax=1, vmin=-1)
+bx.xaxis.tick_top()
+plt.xticks(rotation=90)
+for tic in bx.xaxis.get_major_ticks():
+    tic.tick1On = tic.tick2On = False
+plt.gca().invert_yaxis()
+plt.tight_layout(**plo.layout_pad)

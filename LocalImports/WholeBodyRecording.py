@@ -67,6 +67,7 @@ class WholeBodyRecording(object):
         self.imaging = imaging
         self.imaging_start = imaging_start
         self.imaging_interval = imaging_interval
+        self.corrmat = {}
     
     def excise_imaging_times(self, intervals, t_pre='xr', red_pre='ryr', green_pre='gyr', t_post='xr', red_post='ryr', green_post='gyr', cooldown_ext=5):
         """
@@ -585,7 +586,7 @@ class WholeBodyRecording(object):
             plt.legend()
         return ax
     
-    def correlate_signals(self, signals, dtypes, metric='pearsonr', max_dist=0.25, return_downsampled_trajectories=False):
+    def correlate_signals(self, signals, dtypes, metric='pearsonr', max_dist=0.25, return_downsampled_trajectories=False, tmin=None, tmax=np.infty, name='correlation'):
         """
         Correlates signals using different metrics of correlation. Uses
         whichever signal is shorter as the reference, and minimizing the 
@@ -609,25 +610,27 @@ class WholeBodyRecording(object):
 
         for si, sig in enumerate(signals):
             if sig=='activity':
-                ts.append(self.activity['x_UT'])
-                ds.append(self.activity['activity'+dtypes[si]])
+                ti = self.activity['x_UT']
+                ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
+                ds.append(self.activity['activity'+dtypes[si]][np.logical_and(ti>tmin, ti<tmax)])
                 ss.append('activity'+dtypes[si])
             if sig=='biolum':
                 ti = self.imaging['xr_UT']
                 gi = self.imaging['gyr'+dtypes[si]]
                 ri = self.imaging['ryr'+dtypes[si]]
                 assert len(ti)==len(gi)==len(ri), "Time mismatch in biolum data."
-                ts.append(ti)
-                ts.append(ti)
-                ds.append(gi)
-                ds.append(ri)
+                ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
+                ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
+                ds.append(gi[np.logical_and(ti>tmin, ti<tmax)])
+                ds.append(ri[np.logical_and(ti>tmin, ti<tmax)])
                 ss.append('biolum-green')
                 ss.append('biolum-red')
             if sig=='TH':
-                ts.append(self.TH['x_UT'])
-                ts.append(self.TH['x_UT'])
-                ds.append(self.TH['temp'+dtypes[si]])
-                ds.append(self.TH['hum'+dtypes[si]])
+                ti = self.TH['x_UT']
+                ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
+                ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
+                ds.append(self.TH['temp'+dtypes[si]][np.logical_and(ti>tmin, ti<tmax)])
+                ds.append(self.TH['hum'+dtypes[si]][np.logical_and(ti>tmin, ti<tmax)])
                 ss.append('temp')
                 ss.append('hum')
 
@@ -644,7 +647,7 @@ class WholeBodyRecording(object):
                     d1 = ds[d1i]
                     d2 = ds[d2i]
                     t1t2 = [t1, t2]
-                    d1d2 = [d2, d2]
+                    d1d2 = [d1, d2]
 
                     samelist = False
                     if len(t1)==len(t2):
@@ -685,7 +688,7 @@ class WholeBodyRecording(object):
                         else:
                             print "Method of correlation not implemented." 
 
-        self.corrmat = {'ps': pmat, 'corr': corrmat, 'names':ss}    
+        self.corrmat[name] = {'ps': pmat, 'corr': corrmat, 'names':ss}    
 
 
 

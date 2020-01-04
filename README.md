@@ -26,7 +26,7 @@ conda create -n per2py python=2.7
 ```
 Pip is autoamtically installed by conda, so all dependencies may be installed using:
 ```
-python -m pip install --user numpy scipy matplotlib ipython jupyter pandas spectrum pywavelets lmfit
+python -m pip install --user numpy scipy matplotlib ipython jupyter pandas spectrum pywavelets lmfit prettyplotlib
 ```
 
 ## Without Anaconda
@@ -43,6 +43,7 @@ If not using Anaconda, it is sufficient to ensure that the following packages ar
 |`pandas`|0.23.4|https://pandas.pydata.org/|
 |`pywavelets`|1.0.1|https://pywavelets.readthedocs.io/en/latest/|
 |`lmfit`|0.9.11|https://lmfit.github.io/lmfit-py/|
+|`prettyplotlib`|0.1.7|https://github.com/olgabot/prettyplotlib|
 
 To check for pip:
 ```
