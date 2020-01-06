@@ -460,18 +460,20 @@ class WholeBodyRecording(object):
             hum_sin['params'] = gparams
             self.sinusoids['hum'] = hum_sin
 
-    def process_activity_data(self, tname='x', actname='activity', lsperiod_fit=False,                      binsize=None):
-        """
-        Performs the analysis of the activity data. The tname, actname
-        arguments tell which of the dict to look at.
-
-        If lsperiod_fit, bounds the resulting sinusoid to have a 
-        period within 1h of LSPgram.
-
-        If binning is given, the data are binned into 'binsize' x act interval 
-        intervals. The circadian phase error for 15-min bins is at most 
-        0.065 rad.
-        """
+    def process_activity_data(self, tname='t', actname='activity', lsperiod_fit=False, binsize=None):
+        """Performs the analysis of the activity data.
+        
+        Parameters
+        ----------
+        tname : str, optional
+            Key for the time series in the self.activity dict to be used,by default 't'
+        actname : str, optional
+            Key for the activity series in the self.activity dict to be used, by default 'activity'
+        lsperiod_fit : bool, optional
+            If True, bounds the resulting sinusoid to have a period within 1h of LSPgram. By default False
+        binsize : int, optional
+            Number of bins in each epoch, by default None. The circadian phase error for 15-min bins is at most 0.065 rad.
+        """        
         x = self.activity[tname]
         act = self.activity[actname]
 
@@ -595,20 +597,38 @@ class WholeBodyRecording(object):
             pass
 
     def plot_cwt_simple(self, dname='temp_es', name='', ax=None, colorbar=True, legend=True):
-        """
-        A simple plot of the CWT
-        """
+        """A simple plot of the continuous wavelet transform of a dataseries.
+        
+        Parameters
+        ----------
+        dname : str, optional
+            [description], by default 'temp_es'
+        name : str, optional
+            [description], by default ''
+        ax : [type], optional
+            [description], by default None
+        colorbar : bool, optional
+            [description], by default True
+        legend : bool, optional
+            [description], by default True
+        
+        Returns
+        -------
+        [type]
+            [description]
+        """        
+
         if ax is None:
             ax = plt.subplot()
 
         if not hasattr(self, 'cwt'):
             self.continuous_wavelet_transform()
 
-        cb = ax.pcolormesh(self.cwt[dname]['x'], self.cwt[dname]['tau'], 
+        cb = ax.pcolormesh(self.cwt[dname]['t'], self.cwt[dname]['tau'], 
                       self.cwt[dname]['cwt_scale'], cmap='jet')
         ax.set_xlabel('Time')
         ax.set_ylabel('Period')
-        ax.plot(self.cwt[dname]['x'], self.cwt[dname]['period'], c='k',
+        ax.plot(self.cwt[dname]['t'], self.cwt[dname]['period'], c='k',
                 label='CWT Tau '+name)
         if colorbar:
             plt.colorbar(cb)
