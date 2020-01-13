@@ -415,7 +415,7 @@ def eigensmooth(times, detrended_data, ev_threshold=0.05, dim=40, min_ev=2):
         eigenvalues_list.append(evals/np.sum(evals))
 
     print str(np.round(timer(),1))+"s"
-    return t1, denoised_data, eigenvalues_list
+    return times, denoised_data, eigenvalues_list
 
 def sinusoidal_fitting(times, data, rhythmic_or_not, fit_times=None,
                        forced_periods=None):

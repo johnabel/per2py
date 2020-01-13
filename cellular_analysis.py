@@ -20,7 +20,7 @@ INPUT_EXT = '.csv'
 
 # do we want plots?
 PLOTCOUNT = 2
-# for each dataset, this is the root filename]
+# for each dataset, this is the root filename
 INPUT_FILES   = ['012218NMS_Green_Pre_Spots in tracks statistics',
                  '012218NMS_Red_Pre_Spots in tracks statistics',
                  '012218NMS_Green_TTX_Spots in tracks statistics',
@@ -194,7 +194,7 @@ for files_dict in all_inputs:
                     detrended_times, detrended_data, eigenvalues, 
                     final_times, final_data, rhythmic_or_not, 
                     lspers, pgram_data, sine_times, sine_data, r2s,
-                    INPUT_DIR, data_type)
+                    INPUT_DIR+'analysis_output/', data_type)
     print str(np.round(timer(),1))+"s"
 
     print "All data saved. Run terminated successfully for "+data_type+'.\n'
