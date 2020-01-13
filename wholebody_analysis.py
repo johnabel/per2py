@@ -81,7 +81,7 @@ mouse1.import_temperature_humidity(TH_FILE)
 mouse1.import_actogram(ACTOGRAM_FILE)
 
 # perform the processing of imaging data - use the restricted values (i.e., those without the times where lighting was active)
-mouse1.process_imaging_data('xr','ryr','gyr')
+mouse1.process_imaging_data('t_excised','red_excised','green_excised')
 
 # perform the processing of temp/hum data
 mouse1.process_temp_hum_data()
@@ -94,19 +94,19 @@ mouse1.continuous_wavelet_transform()
 
 # perform the correlational analysis for times 24-120, and 216-end
 mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_b', '_es', '_es'], 
-                         tmin=24, tmax=120, name='start')
+                         tmin=110, tmax=182, name='start')
 mouse1.correlate_signals(['activity', 'biolum', 'TH'], ['_b', '_es', '_es'], 
                          tmin=216, name='end')
 
 
-# let's see how phases change over time
+# plot of phase change over time
 plt.figure()
 plt.plot(mouse1.cwt['activity_es']['x'], np.cos(mouse1.cwt['activity_es']['phase']), 'k', label='Activity')
-plt.plot(mouse1.cwt['ryr_es']['x'], np.cos(mouse1.cwt['ryr_es']['phase']), 'r:', label='Red - Muscle')
+plt.plot(mouse1.cwt['red_excised_es']['x'], np.cos(mouse1.cwt['red_excised_es']['phase']), 'r:', label='Red - Muscle')
 # only plot where green is circadian
-good_green = np.where(np.logical_and(mouse1.cwt['gyr_es']['period']>20, 
-                      mouse1.cwt['gyr_es']['period']<28))[0]
-plt.plot(mouse1.cwt['gyr_es']['x'][good_green], np.cos(mouse1.cwt['gyr_es']['phase'][good_green]), 'g--', label='Green - Liver')
+good_green = np.where(np.logical_and(mouse1.cwt['green_excised_es']['period']>20, 
+                      mouse1.cwt['green_excised_es']['period']<28))[0]
+plt.plot(mouse1.cwt['green_excised_es']['x'][good_green], np.cos(mouse1.cwt['green_excised_es']['phase'][good_green]), 'g--', label='Green - Liver')
 plt.xlabel('Time (h)')
 plt.xticks([0,24,48,72,96,120,144,168,192,216,240,264,288])
 plt.ylabel(r'Cos($\phi$), Continuous Wavelet Transform')
@@ -114,27 +114,44 @@ plt.ylim([-1,1.5])
 plt.legend()
 plt.tight_layout(**plo.layout_pad)
 
-# and finally, let's see how different signals are correlated at the start and at the end of the experiment
 
+# and finally, examine different signals are correlated at the start and at the end of the experiment
 fig = plt.figure()
 bx = plt.subplot()
+pvals = mouse1.corrmat['start']['ps']
+rs = mouse1.corrmat['start']['corr']
+names = mouse1.corrmat['start']['names']
 red_purple = brewer2mpl.get_map('RdBu', 'Diverging', 9).mpl_colormap
-ppl.pcolormesh(fig, bx, mouse1.corrmat['start']['corr'], cmap=red_purple, 
-               xticklabels = mouse1.corrmat['start']['names'],
-               yticklabels = mouse1.corrmat['start']['names'], vmax=1, vmin=-1)
+ppl.pcolormesh(fig, bx, rs, cmap=red_purple, 
+               xticklabels = names, yticklabels = names, vmax=1, vmin=-1)
 bx.xaxis.tick_top()
 plt.xticks(rotation=90)
+# for i in range(len(names)):
+#     for j in range(len(names)):
+#         if pvals[i, j] < 0.01:
+#             text = bx.text(j+0.1, i+1., '**', color="k")
+#         elif pvals[i, j] < 0.05:
+#             text = bx.text(j+0.25, i+1., '*', color="k")
 for tic in bx.xaxis.get_major_ticks():
     tic.tick1On = tic.tick2On = False
 plt.gca().invert_yaxis()
 plt.tight_layout(**plo.layout_pad)
 
+
 fig = plt.figure()
 bx = plt.subplot()
+pvals = mouse1.corrmat['end']['ps']
+rs = mouse1.corrmat['end']['corr']
+names = mouse1.corrmat['end']['names']
 red_purple = brewer2mpl.get_map('RdBu', 'Diverging', 9).mpl_colormap
-ppl.pcolormesh(fig, bx, mouse1.corrmat['end']['corr'], cmap=red_purple, 
-               xticklabels = mouse1.corrmat['end']['names'],
-               yticklabels = mouse1.corrmat['end']['names'], vmax=1, vmin=-1)
+ppl.pcolormesh(fig, bx, rs, cmap=red_purple, 
+               xticklabels = names, yticklabels = names, vmax=1, vmin=-1)
+# for i in range(len(names)):
+#     for j in range(len(names)):
+#         if pvals[i, j] < 0.01:
+#             text = bx.text(j+0.1, i+1., '**', color="k")
+#         elif pvals[i, j] < 0.05:
+#             text = bx.text(j+0.25, i+1., '*', color="k")
 bx.xaxis.tick_top()
 plt.xticks(rotation=90)
 for tic in bx.xaxis.get_major_ticks():

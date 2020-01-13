@@ -577,7 +577,7 @@ class WholeBodyRecording(object):
 
         # t/h data
         for datatype in ['temp_'+dtype, 'hum_'+dtype]:
-            x = self.TH['x_UT']
+            x = self.TH['t_UT']
             try:
                 y = self.TH[datatype]
                 cwt = blu.continuous_wavelet_transform(x,y,shortestperiod=shortestperiod, longestperiod=longestperiod, nvoice=nvoice, be=be)
@@ -589,7 +589,7 @@ class WholeBodyRecording(object):
         # activity data
         try:
             # throws an optimization error
-            x = self.activity['x_UT']
+            x = self.activity['t_UT']
             y = self.activity['activity_es']
             cwt = blu.continuous_wavelet_transform(x,y,shortestperiod=shortestperiod, longestperiod=longestperiod, nvoice=nvoice, be=be)
             self.cwt['activity_es'] = cwt
@@ -660,7 +660,7 @@ class WholeBodyRecording(object):
 
         for si, sig in enumerate(signals):
             if sig=='activity':
-                ti = self.activity['x_UT']
+                ti = self.activity['t_UT']
                 ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
                 ds.append(self.activity['activity'+dtypes[si]][np.logical_and(ti>tmin, ti<tmax)])
                 ss.append('activity'+dtypes[si])
@@ -676,7 +676,7 @@ class WholeBodyRecording(object):
                 ss.append('biolum-green')
                 ss.append('biolum-red')
             if sig=='TH':
-                ti = self.TH['x_UT']
+                ti = self.TH['t_UT']
                 ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
                 ts.append(ti[np.logical_and(ti>tmin, ti<tmax)])
                 ds.append(self.TH['temp'+dtypes[si]][np.logical_and(ti>tmin, ti<tmax)])
@@ -689,7 +689,7 @@ class WholeBodyRecording(object):
 
         for d1i in np.arange(len(ds)):
             for d2i in np.arange(len(ds)):
-                if d1i <= d2i:
+                if d1i < d2i:
 
                     # get which data we are correlating
                     t1 = ts[d1i]
