@@ -57,7 +57,7 @@ pip install -U [packagename]
 ```
 
 # Usage
-We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook is provided for a simplified interface to the standardized tools for analysis of single-cell data, and a Python script is provided for a more experienced user. Likewise, a Jupyter notebook is provided for analysis of whole-body circadian recordings, and a Python script is also provided for the experienced user. We note that whole-body analysis of circadian data is less readily standardized, and so these scripts likely should be modified for individual use. Example data for each script is included in the `Demo` directory.
+We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook is provided for a simplified interface to the standardized tools for analysis of single-cell data, and a Python script is provided for a more experienced user. Example data for each script is included in the `Demo` directory.
 A summary of the saved results is provided in the Interpreting Results subsection below. 
 
 ## Running analysis in a Jupyter/iPython Notebook
