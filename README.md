@@ -1,13 +1,15 @@
 # Code for per2py data analysis
 This repository contains code for processing color-switching Per2iLuc data in a high-throughput manner, with a manuscript under review. It uses the scientific Python stack to identify and process circadian oscillatory data in a reproducible manner.
 
-## TODO: figure out how to deal with wholebody processing
+Per2iLuc color switching may be useful for studying either cellular in vitro or whole-animal in vivo circadian oscillation. To handle these two scenarios, we have created a suite of data analytics functions tailored to each. All code is presented here so that an experienced computational biologist can adapt the code for their specific use.
 
-Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs.
+Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs. For any errors, bugs, or questions, please use the Issues board on this Github repository. It is possible that this code should be adapted for the individual system employed for experimentation. If this is desired, please contact John Abel at jhabel01(at)gmail(dot)com.
 
 # Table of Contents
 * [Installation](#Installation)
 * [Usage](#Usage)
+* [Analysis of cellular bioluminescence recordings](#Analysis-of-cellular-bioluminescence-recordings)
+* [Analysis of whole-body bioluminescence recordings](#Analysis-of-whole-body-bioluminescence-recordings)
 * [License](#License)
 * [Authors](#Authors)
 * [Funding](#Funding)
@@ -24,7 +26,7 @@ conda create -n per2py python=2.7
 ```
 Pip is autoamtically installed by conda, so all dependencies may be installed using:
 ```
-python -m pip install --user numpy scipy matplotlib ipython jupyter pandas spectrum pywavelets lmfit
+python -m pip install --user numpy scipy matplotlib ipython jupyter pandas spectrum pywavelets lmfit prettyplotlib
 ```
 
 ## Without Anaconda
@@ -41,6 +43,7 @@ If not using Anaconda, it is sufficient to ensure that the following packages ar
 |`pandas`|0.23.4|https://pandas.pydata.org/|
 |`pywavelets`|1.0.1|https://pywavelets.readthedocs.io/en/latest/|
 |`lmfit`|0.9.11|https://lmfit.github.io/lmfit-py/|
+|`prettyplotlib`|0.1.7|https://github.com/olgabot/prettyplotlib|
 
 To check for pip:
 ```
@@ -53,18 +56,25 @@ pip install -U [packagename]
 ```
 
 # Usage
-We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook method is provided for a simplified interface, and a command line environment is provided for a more experienced user. A summary of the saved results is provided in the Interpreting Results subsection below.
+We have provided two interfaces for running the data analysis tools within this package. A Jupyter Notebook is provided for a simplified interface to the standardized tools for analysis of single-cell data, and a Python script is provided for a more experienced user. Likewise, a Jupyter notebook is provided for analysis of whole-body circadian recordings, and a Python script is also provided for the experienced user. We note that whole-body analysis of circadian data is less readily standardized, and so these scripts likely should be modified for individual use. Example data for each script is included in the `Demo` directory.
+A summary of the saved results is provided in the Interpreting Results subsection below. 
 
 ## Running analysis in a Jupyter/iPython Notebook
-The Jupyter Notebook provides a simple interface to the computational tools within this package.
+The Jupyter Notebook provides a simple interface to the computational tools within this package. For analysis of single-cell data, open the `cellular_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. For analysis of whole-body recordings, including actigraphy, temperature, and humidity, open the `wholebody_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. Evaluate each cell sequentially to perform the data analysis.
+
+Details regarding the computations performed in each of these notebooks are provided below.
 
 ## Running analysis using a terminal and command line
-In addition to a Jupyter Notebook, we have provided a command line interface to the analysis tools.
+In addition to a Jupyter Notebook, we have provided a Python script interface to the analysis tools. To run this code, adjust the lines near the top of the file, and do `python [script_name].py` to run the code. We note that the user may want to adjust some parameters (e.g., sampling interval) before use. If using conda as above, run `conda activate per2py` in the terminal before running the analysis to ensure the proper environment is used.
+
+# Analysis of cellular bioluminescence recordings
+
+## Importing data
 
 The data may be imported directly from the imageJ output .xls file. If so, set:
 ```
 pull_from_imagej = True
-input_folder = [path to folder containing data]
+input_folder = [path to directory containing data]
 input_ij_file   = [name of imageJ file with no extension]
 ```
 
@@ -91,7 +101,7 @@ The data produced during this analysis includes detrended signal, detrended and 
 
 <br><br>
 
-# Step-by-step details on bioluminescence processing
+## Step-by-step details for analysis of single-cell data
 1. **Import data.**
     Details on the data import are provided in the instructions section.
 <br><br>
@@ -123,6 +133,16 @@ The data produced during this analysis includes detrended signal, detrended and 
 
 9.  **Generate plots for error-checking.**
     Summaries of the data processing are performed for three cells selected at random. Subpanels are A-F, left to right, top to bottom. (A) Raw bioluminescence data. (B) Raw bioluminescence with trend (gold). (C) Detrended bioluminescence. (D) Eigendecomposition (gold) with threshold for reconstruction (red). (E) Detrended and denoised reconstructed signal. (F) Lomb-Scargle periodogram with rhythmic test in y-axis. (G) Sinusoid fit to data with $R^2$ value in y-axis label. (H) Detrended, denoised, and sine fit plotted simultaneously. These are **saved in the analysis_outputs folder**.
+
+# Analysis of whole-body bioluminescence recordings
+
+## Importing whole-body bioluminescence traces, actigraphy, temperature, and humidity
+
+## Interpreting Results
+
+
+## Step-by-step details for analysis of whole-body data
+
 
 # License
 
