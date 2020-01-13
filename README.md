@@ -5,11 +5,12 @@ Per2iLuc color switching may be useful for studying either cellular in vitro or 
 
 Below, please find instructions for the use of this package, and a step-by-step walkthrough of the analysis it performs. For any errors, bugs, or questions, please use the Issues board on this Github repository. It is possible that this code should be adapted for the individual system employed for experimentation. If this is desired, please contact John Abel at jhabel01(at)gmail(dot)com.
 
+Version 0.1.0, 13 Jan 2020.
+
 # Table of Contents
 * [Installation](#Installation)
 * [Usage](#Usage)
 * [Analysis of cellular bioluminescence recordings](#Analysis-of-cellular-bioluminescence-recordings)
-* [Analysis of whole-body bioluminescence recordings](#Analysis-of-whole-body-bioluminescence-recordings)
 * [License](#License)
 * [Authors](#Authors)
 * [Funding](#Funding)
@@ -60,7 +61,7 @@ We have provided two interfaces for running the data analysis tools within this 
 A summary of the saved results is provided in the Interpreting Results subsection below. 
 
 ## Running analysis in a Jupyter/iPython Notebook
-The Jupyter Notebook provides a simple interface to the computational tools within this package. For analysis of single-cell data, open the `cellular_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. For analysis of whole-body recordings, including actigraphy, temperature, and humidity, open the `wholebody_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. Evaluate each cell sequentially to perform the data analysis.
+The Jupyter Notebook provides a simple interface to the computational tools within this package. For analysis of single-cell data, open the `cellular_analysis.ipynb` jupyter notebook using a Python 2.7 interpreter. Evaluate each cell sequentially to perform the data analysis.
 
 Details regarding the computations performed in each of these notebooks are provided below.
 
@@ -136,12 +137,7 @@ The data produced during this analysis includes detrended signal, detrended and 
 
 # Analysis of whole-body bioluminescence recordings
 
-## Importing whole-body bioluminescence traces, actigraphy, temperature, and humidity
-
-## Interpreting Results
-
-
-## Step-by-step details for analysis of whole-body data
+This will be added in future work.
 
 
 # License
