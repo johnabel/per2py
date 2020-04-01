@@ -24,6 +24,7 @@ The scripts in this package are written in Python 2.7. The following dependencie
 To set up an Anaconda environement for these scripts, run in a terminal command line interpreter:
 ```
 conda create -n per2py python=2.7
+conda activate per2py
 ```
 Pip is autoamtically installed by conda, so all dependencies may be installed using:
 ```
