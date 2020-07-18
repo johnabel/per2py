@@ -87,7 +87,7 @@ for files_dict in all_inputs:
                                     denoised_data, locations, truncate_t=12)
 
     # V. LS PERIODOGRAM TEST FOR RHYTHMICITY
-    lspers, pgram_data, circadian_peaks, lspeak_periods, rhythmic_or_not = cr.LS_pgram(final_times, final_data)
+    lspers, pgram_data, circadian_peaks, lspeak_periods, rhythmic_or_not = cr.LS_pgram(detrended_times, detrended_data)
 
     # VI. GET A SINUSOIDAL FIT TO EACH CELL
     # use final_times, final_data

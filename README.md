@@ -125,7 +125,7 @@ The data produced during this analysis includes detrended signal, detrended and 
     
 6. **Apply a Lomb-Scargle periodogram to determine which timeseries.**
     The Lomb-Scargle periodogram is used to identify statistically significant circadian oscillation. Here,
-    we have defined this as having a dominant peak of P<0.05 between periods of 18 and 30 h. The method for periodogram calculation and corresponding P-values is from WH Press, Numerical Recipes, 1994, p576. The final periodogram is normalized using the standard normalization in astropy or scipy. We applied this to the detrended, denoised, and truncated data so that the noise difference between channels is corrected.<br><br>
+    we have defined this as having a dominant peak of P<0.05 between periods of 18 and 30 h. The method for periodogram calculation and corresponding P-values is from WH Press, Numerical Recipes, 1994, p576. The final periodogram is normalized using the standard normalization in astropy or scipy. In Shan et al. 2020 we applied this to the detrended, denoised, and truncated data so that the noise difference between channels is corrected, however, for general use this should be applied to the detrended but not denoised data, as is in this repository.<br><br>
     
 7. **Fit a damped cosine to the data to yield sine fit, phase, amplitude, damping rate, goodness of fit.**
     All rhythmic cells are now fit by a damped sinusoid plus a polynomial (to fit any non-oscillatory trend) using nonlinear least squares. Only the sinusoid data is returned.<br><br>
